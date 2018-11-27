@@ -29,6 +29,8 @@
         <table class="vSiteResults" id="selectedSETable">
             <tr class="site_table_row_1">
                 <th class="site_table">Name</th>
+                <th class="site_table">Description</th>
+                <th class="site_table">Reserved</th>
                 <?php if(!$params['portalIsReadOnly']):?>
                     <th class="site_table">Remove</th>
                 <?php endif; ?>
@@ -39,7 +41,7 @@
                 foreach($params['Scopes'] as $scope) {
                 ?>
                 <tr class="site_table_row_<?php echo $num ?>">
-                    <td class="site_table" style="width: 90%">
+                    <td class="site_table" style="width: 20%">
                         <div style="background-color: inherit;">
                             <span style="vertical-align: middle;">
                                 <a href="index.php?Page_Type=Admin_Scope&amp;id=<?php echo $scope->getId() ?>">
@@ -47,6 +49,18 @@
                                 </a>
                             </span>
                         </div>
+                    </td>
+                    <td class="site_table" style="width: 60%">
+                        <div style="background-color: inherit;">
+                            <span style="vertical-align: middle;">
+                              <?php xecho($scope->getDescription()); ?>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="site_table" style="width: 10%">
+                      <?php if($scope->getReserved() == 1):?>
+                        <img src="<?php echo \GocContextPath::getPath()?>img/tick.png" height="22px" style="vertical-align: middle;" />
+                      <?php endif ?>
                     </td>
                     <?php if(!$params['portalIsReadOnly']):?>
                         <td class="site_table">

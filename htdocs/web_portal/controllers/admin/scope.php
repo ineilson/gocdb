@@ -34,13 +34,14 @@ function view_scope(){
     $serv= \Factory::getScopeService();
     $scope =$serv ->getScope($_REQUEST['id']);
 
-    $params['Name'] = $scope -> getName();
+    $params['Name'] = $scope->getName();
     $params['Description'] = $scope->getDescription();
-    $params['ID']= $scope ->getId();
-    $params['NGIs'] = $serv ->getNgisFromScope($scope);
-    $params['Sites'] = $serv ->getSitesFromScope($scope);
-    $params['ServiceGroups'] = $serv ->getServiceGroupsFromScope($scope);
-    $params['Services'] = $serv ->getServicesFromScope($scope);
+    $params['ID']= $scope->getId();
+    $params['Reserved'] = $scope->getReserved();
+    $params['NGIs'] = $serv->getNgisFromScope($scope);
+    $params['Sites'] = $serv->getSitesFromScope($scope);
+    $params['ServiceGroups'] = $serv->getServiceGroupsFromScope($scope);
+    $params['Services'] = $serv->getServicesFromScope($scope);
     $params['portalIsReadOnly'] = portalIsReadOnlyAndUserIsNotAdmin($user);
 
     show_view("admin/scope.php", $params, $params['Name']);
