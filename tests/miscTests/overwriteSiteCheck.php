@@ -9,9 +9,9 @@
 //
 // Author: Ian Neilson. Feb-2019
 // -------------------------------------------------------------------------- //
-require_once __DIR__ . '/lib/Gocdb_Services/Factory.php';
-require_once __DIR__ . '/lib/Gocdb_Services/Site.php';
-require_once __DIR__ . '/lib/Gocdb_Services/User.php';
+require_once __DIR__ . '/../../lib/Gocdb_Services/Factory.php';
+require_once __DIR__ . '/../../lib/Gocdb_Services/Site.php';
+require_once __DIR__ . '/../../lib/Gocdb_Services/User.php';
 require_once __DIR__ . '/overwriteSiteUtils.php';
 
 if ($argc < 4) {

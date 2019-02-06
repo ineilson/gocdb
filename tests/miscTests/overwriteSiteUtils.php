@@ -1,5 +1,11 @@
 <?php
-require_once __DIR__ . '/lib/Gocdb_Services/Factory.php';
+// -------------------------------------------------------------------------- //
+// Supporting functions for overwriteSite.php and overWriteSiteCheck.php
+//
+// Author: Ian Neilson. Feb-2019
+// -------------------------------------------------------------------------- //
+require_once __DIR__ . '/../../lib/Gocdb_Services/Factory.php';
+
 function getSiteValues (Site $site) {
   
   $newValues = array();
@@ -31,7 +37,7 @@ function getSiteValues (Site $site) {
   $newValues['Site']['CSIRTTEL'] = $site->getCsirtTel();
   $newValues['Site']['EMERGENCYTEL'] = $site->getEmergencyTel();
   $newValues['Site']['EMERGENCYEMAIL'] = $site->getEmergencyEmail();
-  $newValues['Site']['EMERGENCYEMAIL'] = $site->getAlarmEmail(); //!!there's an error here!!
+  $newValues['Site']['EMERGENCYEMAIL'] = $site->getAlarmEmail();
   $newValues['Site']['HELPDESKEMAIL'] = $site->getHelpdeskEmail();
   $newValues['Site']['TIMEZONE'] = $site->getTimezoneId();
   
