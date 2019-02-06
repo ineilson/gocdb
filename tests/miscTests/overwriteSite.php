@@ -43,12 +43,14 @@ while ($overwriteCount > 0) {
   // set the description to the md5 hash of the new values
   $newValues['Site']['LOCATION'] = $sourceSite->getShortName().' '.$overwriteCount;
   $newValues['Site']['DESCRIPTION'] = hashSiteValues($newValues);
-  // echo 'writing site hash '.$newValues['Site']['DESCRIPTION']."\n";
   $site = $service->editSite($targetSite, $newValues, $user);
   $overwriteCount -= 1;
   echo ".";
   usleep(rand(1000,100000));
 }
+
+dumpSiteValues($newValues);
+
 echo "\n";
 
 return;

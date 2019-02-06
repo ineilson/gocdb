@@ -11,7 +11,6 @@
 // -------------------------------------------------------------------------- //
 require_once __DIR__ . '/../../lib/Gocdb_Services/Factory.php';
 require_once __DIR__ . '/../../lib/Gocdb_Services/Site.php';
-require_once __DIR__ . '/../../lib/Gocdb_Services/User.php';
 require_once __DIR__ . '/overwriteSiteUtils.php';
 
 if ($argc < 4) {
@@ -44,8 +43,8 @@ while ($count > 0) {
   $location    = $newValues['Site']['LOCATION'];
   
   if ($description != $hashValue) {
-    echo 'Inconsistency found. Location is '.$location."\n";
-    return;
+    echo '##### Inconsistency found #####';
+    break;
   } 
   
   if ($location != $lastLocation) {
@@ -59,6 +58,9 @@ while ($count > 0) {
   $count -= 1;
   usleep(rand(1000,10000));
 }
+
+dumpSiteValues($newValues);
+
 echo "\n";
 
 return;

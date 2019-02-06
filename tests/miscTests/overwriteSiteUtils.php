@@ -5,6 +5,12 @@
 // Author: Ian Neilson. Feb-2019
 // -------------------------------------------------------------------------- //
 require_once __DIR__ . '/../../lib/Gocdb_Services/Factory.php';
+require_once __DIR__ . '/../../lib/Gocdb_Services/User.php';
+
+$SITE_KEYS = array('HOME_URL','EMAIL','CONTACTTEL','GIIS_URL','LATITUDE',
+'LONGITUDE','CSIRTEMAIL','IP_RANGE','IP_V6_RANGE',
+'DOMAIN','LOCATION','CSIRTTEL','EMERGENCYTEL',
+'HELPDESKEMAIL','TIMEZONE');
 
 function getSiteValues (Site $site) {
   
@@ -48,16 +54,28 @@ function hashSiteValues (array $values) {
   
   $stringToHash = '';
   
-  $keys = array('HOME_URL','EMAIL','CONTACTTEL','GIIS_URL','LATITUDE',
-  'LONGITUDE','CSIRTEMAIL','IP_RANGE','IP_V6_RANGE',
-  'DOMAIN','LOCATION','CSIRTTEL','EMERGENCYTEL',
-  'HELPDESKEMAIL','TIMEZONE');
-  
-  foreach ($keys as $key) {    
+  foreach ($GLOBALS['SITE_KEYS'] as $key) {    
     $stringToHash .= $values['Site'][$key];
   }
   
   return hash('md5',$stringToHash);
+}
+// ------------------------------------------------------------------------- //
+function dumpSiteValues (array $values) {
+  
+  $stringToHash = '';
+  
+  echo "\n";
+  
+  foreach ($GLOBALS['SITE_KEYS'] as $key) {
+    $stringToHash .= ($value = $values['Site'][$key]);    
+    echo str_pad($key,15).$value."\n";
+  }
+  
+  $hash = hash('md5',$stringToHash);
+  echo str_pad('HASH',15).$hash."\n";
+  
+  return $hash;
 }
 // ------------------------------------------------------------------------- //
 function getUser ($dn) {
