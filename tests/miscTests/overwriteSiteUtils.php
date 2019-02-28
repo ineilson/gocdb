@@ -12,6 +12,8 @@ $SITE_KEYS = array('HOME_URL','EMAIL','CONTACTTEL','GIIS_URL','LATITUDE',
 'DOMAIN','LOCATION','CSIRTTEL','EMERGENCYTEL',
 'HELPDESKEMAIL','TIMEZONE');
 
+$COMPACT_KEYS = array('DOMAIN','LOCATION');
+
 function getSiteValues (Site $site) {
   
   $newValues = array();
@@ -61,15 +63,17 @@ function hashSiteValues (array $values) {
   return hash('md5',$stringToHash);
 }
 // ------------------------------------------------------------------------- //
-function dumpSiteValues (array $values) {
+function dumpSiteValues (array $values, $compact=NULL) {
   
   $stringToHash = '';
   
   echo "\n";
   
   foreach ($GLOBALS['SITE_KEYS'] as $key) {
-    $stringToHash .= ($value = $values['Site'][$key]);    
-    echo str_pad($key,15).$value."\n";
+    if (!$compact or in_array($key, $GLOBALS['COMPACT_KEYS'])) {
+      $stringToHash .= ($value = $values['Site'][$key]);    
+      echo str_pad($key,15).$value."\n";
+    }
   }
   
   $hash = hash('md5',$stringToHash);

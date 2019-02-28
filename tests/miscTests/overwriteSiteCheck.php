@@ -2,6 +2,8 @@
 // -------------------------------------------------------------------------- //
 // Repeatedly check a specified (target) GOCDB site details whose details
 // have been overwritten by use of overwriteSite.php (see there for more details) 
+// If an inconsistency is found, a file, specified by the 'stopfile' argument
+// is created.
 // Proper error handling is very limited!
 //
 // Usage: php overwriteSiteCheck.php siteId count dn
@@ -13,12 +15,12 @@ require_once __DIR__ . '/../../lib/Gocdb_Services/Factory.php';
 require_once __DIR__ . '/../../lib/Gocdb_Services/Site.php';
 require_once __DIR__ . '/overwriteSiteUtils.php';
 
-if ($argc < 4) {
-  echo 'Too few arguments. Usage: php overwriteSiteCheck.php siteId count dn'."\n"; 
+if ($argc < 5) {
+  echo 'Too few arguments. Usage: php overwriteSiteCheck.php siteId count stopfile dn'."\n"; 
   return;
 }
 
-$user = getUser($argv[3]);
+$user = getUser($argv[4]);
 
 $siteId = $argv[1];
 
@@ -27,6 +29,7 @@ $service = \Factory::getSiteService();
 echo 'Checking  '.$service->getSite($siteId)->getShortName() ."\n";
 
 $count = $argv[2];
+$stopfile = $argv[3];
 
 $lastLocation = '';
 
@@ -43,6 +46,7 @@ while ($count > 0) {
   $location    = $newValues['Site']['LOCATION'];
   
   if ($description != $hashValue) {
+    fopen($stopfile, 'w') or die('Cannot open file:  '.$stopfile);
     echo '##### Inconsistency found #####';
     break;
   } 
@@ -59,7 +63,7 @@ while ($count > 0) {
   usleep(rand(1000,10000));
 }
 
-dumpSiteValues($newValues);
+dumpSiteValues($newValues, TRUE);
 
 echo "\n";
 
