@@ -25,7 +25,7 @@ if ($argc < 4) {
 
 require __DIR__."/../../lib/Doctrine/bootstrap_doctrine.php";
 require __DIR__."/../../lib/Doctrine/bootstrap.php";
-require "./overwriteSiteUtils.php";
+require "./overwriteSiteUtilsBasic.php";
 
 // require_once __DIR__ . '/overwriteSiteUtils.php';
 
@@ -42,6 +42,8 @@ if (!$site) {
   echo 'Site '.$targetSite.' not found.'."\n";
   return;
 }
+
+$siteValues = NULL;
 
 while ($count > 0 and !file_exists($stopfile)) {
   $siteValues = getSiteValues($site);

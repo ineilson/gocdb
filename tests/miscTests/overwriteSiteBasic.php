@@ -25,11 +25,7 @@ if ($argc < 5) {
 
 require __DIR__."/../../lib/Doctrine/bootstrap_doctrine.php";
 require __DIR__."/../../lib/Doctrine/bootstrap.php";
-require "./overwriteSiteUtils.php";
-
-// require_once __DIR__ . '/overwriteSiteUtils.php';
-
-// $entityManager defined above;
+require "./overwriteSiteUtilsBasic.php";
 
 $overwriteCount = $argv[3];
 
@@ -71,10 +67,7 @@ while ($overwriteCount > 0 and !file_exists($stopfile)) {
   $entityManager->flush();
   $entityManager->getConnection()->commit();
   
-  // set the description to the md5 hash of the new values
-  //$newValues['Site']['LOCATION'] = $sourceSite->getShortName().' '.$overwriteCount;
-  //$newValues['Site']['DESCRIPTION'] = hashSiteValues($newValues);
-  //$site = $service->editSite($targetSite, $newValues, $user);
+
   $overwriteCount -= 1;
   echo ".";
   usleep(rand(1000,100000));
