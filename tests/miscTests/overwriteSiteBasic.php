@@ -18,13 +18,14 @@
 // Author: Ian Neilson. Feb-2019
 // -------------------------------------------------------------------------- //
 
-if ($argc < 6) {
+if ($argc < 5) {
   echo 'Too few arguments. Usage: php overwriteSite.php targetId sourceId count stopfile dn'."\n";
   exit (1);
 }
 
 require __DIR__."/../../lib/Doctrine/bootstrap_doctrine.php";
 require __DIR__."/../../lib/Doctrine/bootstrap.php";
+require "./overwriteSiteUtils.php";
 
 // require_once __DIR__ . '/overwriteSiteUtils.php';
 
@@ -37,7 +38,6 @@ if (file_exists($stopfile)) {
   echo $stopfile.' already exists. Terminating.'."\n";
   exit (1);
 }
-//$user = getUser($argv[5]);
 
 $targetSite = $entityManager->find("Site", $argv[1]);
 if (!$targetSite) {
@@ -50,22 +50,17 @@ if (!$sourceSite) {
   return;
 }
 
-$sourceShortName = $sourceSite->getShortName();
-$targetShortName = $targetSite->getShortName();
+$sourceValues = getSiteValues($sourceSite);
+$sourceValues['Site']['SHORT_NAME']  = $targetSite->getShortName();
 
-echo 'Source before write - '.$sourceSite->getId().';';
-echo $sourceShortName."\n";
-echo 'Target before write - '.$targetSite->getId().';';
-echo $targetSite->getLocation()."\n";
-
+echo 'source->target '.$sourceSite->getShortName().'->'.$targetSite->getShortName()."\n";
 
 while ($overwriteCount > 0 and !file_exists($stopfile)) {
   $entityManager->getConnection()->beginTransaction();
   try {
-    $location = $sourceSite->getShortName().' '.$overwriteCount;
-    $hash = hash('md5',$targetShortName.$location);
-    $targetSite->setLocation($location);
-    $targetSite->setDescription($hash);
+    $sourceValues['Site']['LOCATION'] = $sourceSite->getShortName().' '.$overwriteCount;
+    setSiteValues($sourceValues, $targetSite);
+    $targetSite->setDescription(hashSiteValues($sourceValues));
   } catch(\Exception $ex){
     $entityManager->getConnection()->rollback();
     $entityManager->close();

@@ -25,6 +25,7 @@ if ($argc < 4) {
 
 require __DIR__."/../../lib/Doctrine/bootstrap_doctrine.php";
 require __DIR__."/../../lib/Doctrine/bootstrap.php";
+require "./overwriteSiteUtils.php";
 
 // require_once __DIR__ . '/overwriteSiteUtils.php';
 
@@ -43,19 +44,21 @@ if (!$site) {
 }
 
 while ($count > 0 and !file_exists($stopfile)) {
-  $val = $site->getShortName().$site->getLocation();
-  $hash = md5($val);
+  $siteValues = getSiteValues($site);
+  $hash = hashSiteValues($siteValues);
   if ($site->getDescription() != $hash) {
     fopen($stopfile, 'w') or die('Cannot open file:  '.$stopfile);
     echo '##### Inconsistency found #####';
     break;
   }
-  echo $val."\n";
+  echo '.';
   $count -= 1;
   usleep(rand(1000,10000));
 }
 
 echo "\n";
+
+dumpSiteValues($siteValues);
 
 return;
 // ------------------------------------------------------------------------- //

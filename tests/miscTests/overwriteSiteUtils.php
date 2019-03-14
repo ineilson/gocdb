@@ -52,6 +52,42 @@ function getSiteValues (Site $site) {
   return $newValues;
 }
 // ------------------------------------------------------------------------- //
+function setSiteValues (array $newValues, Site $site) {
+    
+  //$newValues['Scope_ids'] = $site->getScopes();
+  //$newValues['ReservedScope_ids'] = array();
+  //$newValues['childServiceScopeAction'] = 'noModify';
+  
+  //$newValues['NGI'] = $site->getNGI()->getName();
+  //$newValues['Country'] = $site->getCountry()->getName();
+  //$newValues['Timezone'] = $site->getTimezone();
+  //$newValues['ProductionStatus'] = $site->getInfrastructure()->getName();
+  
+  $site->setOfficialName($newValues['Site']['OFFICIAL_NAME']);
+  $site->setShortName($newValues['Site']['SHORT_NAME']);
+  $site->setDescription($newValues['Site']['DESCRIPTION']);
+  $site->setHomeUrl($newValues['Site']['HOME_URL']);
+  $site->setEmail($newValues['Site']['EMAIL']);
+  $site->setTelephone($newValues['Site']['CONTACTTEL']);
+  $site->setGiisUrl($newValues['Site']['GIIS_URL']);
+  $site->setLatitude($newValues['Site']['LATITUDE']);
+  $site->setLongitude($newValues['Site']['LONGITUDE']);
+  $site->setCsirtEmail($newValues['Site']['CSIRTEMAIL']);
+  $site->setIpRange($newValues['Site']['IP_RANGE']); // 0.0.0.0/255.000.255.255
+  // $newValues['Site']['IP_RANGE'] = '0.0.0.0/255.000.255.000';
+  $site->setIpV6Range($newValues['Site']['IP_V6_RANGE']);
+  $site->setDomain($newValues['Site']['DOMAIN']);
+  $site->setLocation($newValues['Site']['LOCATION']);
+  $site->setCsirtTel($newValues['Site']['CSIRTTEL']);
+  $site->setEmergencyTel($newValues['Site']['EMERGENCYTEL']);
+  $site->setEmergencyEmail($newValues['Site']['EMERGENCYEMAIL']);
+  $site->setAlarmEmail($newValues['Site']['EMERGENCYEMAIL']);
+  $site->setHelpdeskEmail($newValues['Site']['HELPDESKEMAIL']);
+  $site->setTimezoneId($newValues['Site']['TIMEZONE']);
+  
+  return;
+}
+// ------------------------------------------------------------------------- //
 function hashSiteValues (array $values) {
   
   $stringToHash = '';
