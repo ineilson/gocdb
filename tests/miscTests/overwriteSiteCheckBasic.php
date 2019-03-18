@@ -59,8 +59,9 @@ while ($count > 0 and !file_exists($stopfile)) {
 }
 
 echo "\n";
-
-dumpSiteValues($siteValues);
+if (is_array($siteValues)) {
+  dumpSiteValues($siteValues);
+}
 
 return;
 // ------------------------------------------------------------------------- //
