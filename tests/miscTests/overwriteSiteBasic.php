@@ -25,7 +25,7 @@ if ($argc < 5) {
 
 require __DIR__."/../../lib/Doctrine/bootstrap_doctrine.php";
 require __DIR__."/../../lib/Doctrine/bootstrap.php";
-require "./overwriteSiteUtilsBasic.php";
+// require "./overwriteSiteUtilsBasic.php";
 
 $overwriteCount = $argv[3];
 
@@ -45,18 +45,22 @@ if (!$sourceSite) {
   echo 'Source site '.$sourceSite.' not found.'."\n";
   return;
 }
+$sourceShortName = $sourceSite->getShortName();
+$targetShortName = $targetSite->getShortName();
 
-$sourceValues = getSiteValues($sourceSite);
-$sourceValues['Site']['SHORT_NAME']  = $targetSite->getShortName();
+$domain = $sourceSite->getDomain();
 
-echo 'source->target '.$sourceSite->getShortName().'->'.$targetSite->getShortName()."\n";
+echo 'source->target '.$sourceShortName.'->'.$targetShortName."\n";
 
 while ($overwriteCount > 0 and !file_exists($stopfile)) {
   $entityManager->getConnection()->beginTransaction();
   try {
-    $sourceValues['Site']['LOCATION'] = $sourceSite->getShortName().' '.$overwriteCount;
-    setSiteValues($sourceValues, $targetSite);
-    $targetSite->setDescription(hashSiteValues($sourceValues));
+    $location = $sourceShortName.' '.$overwriteCount;
+    $targetSite->setLocation($location); 
+    $targetSite->setDomain($domain);
+//    $hashValues = $domain.$location.$targetShortName;
+    $hashValues = $domain.$location;
+    $targetSite->setDescription(hash('md5',$hashValues));
   } catch(\Exception $ex){
     $entityManager->getConnection()->rollback();
     $entityManager->close();
