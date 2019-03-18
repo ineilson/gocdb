@@ -56,6 +56,7 @@ while ($count > 0 and !file_exists($stopfile)) {
   usleep(rand(1000,10000));
 }
 
+echo "\n";
 echo 'Domain    '.$site->getDomain()."\n";
 echo 'Location  '.$site->getLocation()."\n";
 echo 'Shortname '.$site->getShortName()."\n";

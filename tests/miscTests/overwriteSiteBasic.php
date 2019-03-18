@@ -18,7 +18,7 @@
 // Author: Ian Neilson. Feb-2019
 // -------------------------------------------------------------------------- //
 
-if ($argc < 5) {
+if ($argc < 4) {
   echo 'Too few arguments. Usage: php overwriteSite.php targetId sourceId count stopfile dn'."\n";
   exit (1);
 }
@@ -27,37 +27,31 @@ require __DIR__."/../../lib/Doctrine/bootstrap_doctrine.php";
 require __DIR__."/../../lib/Doctrine/bootstrap.php";
 // require "./overwriteSiteUtilsBasic.php";
 
-$overwriteCount = $argv[3];
-
-$stopfile = $argv[4];
-if (file_exists($stopfile)) {
-  echo $stopfile.' already exists. Terminating.'."\n";
-  exit (1);
-}
-
 $targetSite = $entityManager->find("Site", $argv[1]);
 if (!$targetSite) {
   echo 'Target site '.$targetSite.' not found.'."\n";
   return;
 }
-$sourceSite = $entityManager->find("Site", $argv[2]);
-if (!$sourceSite) {
-  echo 'Source site '.$sourceSite.' not found.'."\n";
-  return;
+
+$overwriteCount = $argv[2];
+
+$stopfile = $argv[3];
+if (file_exists($stopfile)) {
+  echo $stopfile.' already exists. Terminating.'."\n";
+  exit (1);
 }
-$sourceShortName = $sourceSite->getShortName();
+
 $targetShortName = $targetSite->getShortName();
+$domain = rand(1,1000);
 
-$domain = $sourceSite->getDomain();
-
-echo 'source->target '.$sourceShortName.'->'.$targetShortName."\n";
+echo 'target '.$targetShortName."\n";
 
 while ($overwriteCount > 0 and !file_exists($stopfile)) {
   $entityManager->getConnection()->beginTransaction();
   try {
-    $location = $sourceShortName.' '.$overwriteCount;
-    $targetSite->setLocation($location); 
-    $targetSite->setDomain($domain);
+    $location = $overwriteCount;
+    $targetSite->setLocation($location); //varies with each loop
+    $targetSite->setDomain($domain); // constant for each loop
 //    $hashValues = $domain.$location.$targetShortName;
     $hashValues = $domain.$location;
     $targetSite->setDescription(hash('md5',$hashValues));
@@ -79,7 +73,9 @@ while ($overwriteCount > 0 and !file_exists($stopfile)) {
 
 echo "\n";
 
-echo 'Target after  write - '.$targetSite->getId().';';
+echo 'Domain    '.$targetSite->getDomain()."\n";
+echo 'Location  '.$targetSite->getLocation()."\n";
+echo 'Shortname '.$targetSite->getShortName()."\n";
 echo $targetSite->getLocation()."\n";
 
 return;
