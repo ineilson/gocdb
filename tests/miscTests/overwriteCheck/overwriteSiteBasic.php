@@ -52,7 +52,7 @@ while ($overwriteCount > 0 and !file_exists($stopfile)) {
   try {
     $location = $overwriteCount;
     $targetSite->setLocation($location); //varies with each loop
-//    $targetSite->setDomain($domain); // constant for each loop
+    $targetSite->setDomain($domain); // constant for each loop
 //    $hashValues = $domain.$location.$targetShortName;
     $hashValues = $domain.$location;
     $targetSite->setDescription(hash('md5',$hashValues));
@@ -66,7 +66,6 @@ while ($overwriteCount > 0 and !file_exists($stopfile)) {
   $entityManager->flush();
   $entityManager->getConnection()->commit();
   
-
   $overwriteCount -= 1;
   echo ".";
   usleep(rand(1000,100000));
