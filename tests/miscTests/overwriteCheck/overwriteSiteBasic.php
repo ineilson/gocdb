@@ -23,8 +23,8 @@ if ($argc < 4) {
   exit (1);
 }
 
-require __DIR__."/../../lib/Doctrine/bootstrap_doctrine.php";
-require __DIR__."/../../lib/Doctrine/bootstrap.php";
+//require_once __DIR__."/../../../lib/Doctrine/bootstrap.php";
+require_once __DIR__."/bootstrap.php";
 // require "./overwriteSiteUtilsBasic.php";
 
 $targetSite = $entityManager->find("Site", $argv[1]);
@@ -43,6 +43,7 @@ if (file_exists($stopfile)) {
 
 $targetShortName = $targetSite->getShortName();
 $domain = rand(1,1000);
+$targetSite->setDomain($domain); // constant for each loop
 
 echo 'target '.$targetShortName."\n";
 
@@ -51,7 +52,7 @@ while ($overwriteCount > 0 and !file_exists($stopfile)) {
   try {
     $location = $overwriteCount;
     $targetSite->setLocation($location); //varies with each loop
-    $targetSite->setDomain($domain); // constant for each loop
+//    $targetSite->setDomain($domain); // constant for each loop
 //    $hashValues = $domain.$location.$targetShortName;
     $hashValues = $domain.$location;
     $targetSite->setDescription(hash('md5',$hashValues));

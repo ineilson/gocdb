@@ -23,13 +23,9 @@ if ($argc < 4) {
   exit (1);
 }
 
-require __DIR__."/../../../lib/Doctrine/bootstrap_doctrine.php";
-require __DIR__."/../../../lib/Doctrine/bootstrap.php";
-//require "./overwriteSiteUtilsBasic.php";
+//require __DIR__."/../../../lib/Doctrine/bootstrap.php";
+require __DIR__."/bootstrap.php";
 
-// require_once __DIR__ . '/overwriteSiteUtils.php';
-
-// $entityManager defined above;
 $targetSite = $argv[1];
 
 $count = $argv[2];

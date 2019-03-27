@@ -23,9 +23,9 @@ if ($argc < 6) {
   exit (1);
 }
 
-require_once __DIR__ . '/../../lib/Gocdb_Services/Factory.php';
-require_once __DIR__ . '/../../lib/Gocdb_Services/Site.php';
-require_once __DIR__ . '/../../lib/Gocdb_Services/User.php';
+require_once __DIR__ . '/../../../lib/Gocdb_Services/Factory.php';
+require_once __DIR__ . '/../../../lib/Gocdb_Services/Site.php';
+require_once __DIR__ . '/../../../lib/Gocdb_Services/User.php';
 require_once __DIR__ . '/overwriteSiteUtils.php';
 
 $service = \Factory::getSiteService();

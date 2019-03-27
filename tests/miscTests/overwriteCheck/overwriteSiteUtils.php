@@ -4,8 +4,8 @@
 //
 // Author: Ian Neilson. Feb-2019
 // -------------------------------------------------------------------------- //
-require_once __DIR__ . '/../../lib/Gocdb_Services/Factory.php';
-require_once __DIR__ . '/../../lib/Gocdb_Services/User.php';
+require_once __DIR__ . '/../../../lib/Gocdb_Services/Factory.php';
+require_once __DIR__ . '/../../../lib/Gocdb_Services/User.php';
 
 $SITE_KEYS = array('HOME_URL','EMAIL','CONTACTTEL','GIIS_URL','LATITUDE',
 'LONGITUDE','CSIRTEMAIL','IP_RANGE','IP_V6_RANGE',
