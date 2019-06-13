@@ -191,28 +191,6 @@ class Config {
         return intval($numScopesRequired);
     }
 
-    /**
-     * Get an array of 'reserved' scope strings or an empty array if non are configured.
-     *
-     * <p>
-     * Reserved scopes can only be assiged by gocdb admin (and in future by selected roles);
-     * they can't be freely assigned to resources by their users/owners.
-     *
-     * @return array Reserved scopes as Strings
-     */
-    public function getReservedScopeList() {
-        $reservedScopes = array ();
-        /* @var $reserved_scopes \SimpleXMLElement */
-        $reserved_scopes = $this->GetLocalInfoXML()->local_info->reserved_scopes;
-        if ($reserved_scopes != null) {
-            /* @var $scope \SimpleXMLElement */
-            foreach ( $reserved_scopes->children () as $scope ) {
-                $reservedScopes [] = ( string ) $scope;
-            }
-        }
-        return $reservedScopes;
-    }
-
     public function getShowMapOnStartPage(){
         $showMapString = $this->GetLocalInfoXML()->local_info->show_map_on_start_page;
 
