@@ -81,8 +81,13 @@ class PIWriteRequest {
      * $this->docsURL)
      */
     public function __construct() {
+        # Use the factory config service. Will return a new instance if one
+        # has not yet been created, otherwise the previously created instance
+        # will be returned. 
+        ## TODO check url override initialisation
+        $configServ = \Factory::getConfigService();
+
         # returns the base portal URL as defined in conf file
-        $configServ = new config();
         $this->baseUrl = $configServ->getServerBaseUrl() . "/gocdbpi";
         $this->docsURL = $configServ->getWriteApiDocsUrl();
     }

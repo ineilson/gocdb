@@ -1,9 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema>
+<config 
+        xmlns="https://goc.stfc.ac.uk"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://goc.stfc.ac.uk/config local_info.xsd">
+
+        <!-- 
+          ## Begin local override.
+          ## Specify a url attribute to be matched  against the incoming requestor
+          ## url. Only a single url is supported.
+          ## If the urls match, the values specified in this section will override
+          ## the default values given in the default (no url) section below.
+          ## Any valid xml element tree can be specified here but it MUST
+          ## exist in the default section that follows.
+          ## Use of elements 'menus','css' and 'name_mappings' are described
+          ## in the defaults section.
+        -->
+        <local_info url="host-172-16-113-108.nubes.stfc.ac.uk">
+
+          <read_only>false</read_only>
+          <show_map_on_start_page>false</show_map_on_start_page>
+
+          <!-- <filter_downtimes_by_default_scope>true</filter_downtimes_by_default_scope> -->
+
+          <menus>
+            <Projects>hide</Projects>
+            <ServiceGroups>hide</ServiceGroups>
+            <NGI>false</NGI>
+            <AddSite>false</AddSite>
+            <Scopes>false</Scopes>
+            <AdminScopes>hide</AdminScopes>
+          </menus>
+
+          <css>
+            <backgroundTop>B5892D</backgroundTop> <!-- // eosc-hub brown -->
+            <backgroundBottom>FCF2DD</backgroundBottom>
+          </css>
+
+          <name_mapping>
+            <Service>
+              <!-- <ServiceEndpoint>Service Component</ServiceEndpoint> -->
+              <endpoint>component</endpoint>
+            </Service>
+          </name_mapping>
+        </local_info>
+        <!-- 
+          ## End local override
+        -->
+
+        <!-- 
+          ## Begin defaults
+        -->
         <local_info>
-        <!-- If read-only is set as true, the portal will prevent changes to the
+
+          <!-- If read-only is set as true, the portal will prevent changes to the
              data by all users. This can be used for a read-only failover instance. -->
-        <read_only>false</read_only>
+          <read_only>false</read_only>
+
+          <!-- If set to true, queries on downtimes (overview/calendar) are limited
+              to services matching the default scope
+              -->
+          <filter_downtimes_by_default_scope>false</filter_downtimes_by_default_scope>
+
+          <!-- menus
+            ## Give the xml element names from config/web_portal/menu.xml
+            ## to select menu link(s) given in the left-hand menu box.
+            ## Selected menus can be hidden by providing an element value
+            ## of any of hide,false,0 or no. The default behaviour is to 
+            ## show the menu subject to the restrictions encoded in menu.xml
+            ## but any other value but those given above will also work to
+            ## enable the menu display.
+          -->
+          <menus>
+            <Projects>true</Projects>
+            <NGI>true</NGI>
+            <ServiceGroups>true</ServiceGroups>
+            <AddSite>true</AddSite>
+            <Scopes>true</Scopes>
+            <AdminScopes>true</AdminScopes>
+          </menus>
+          <!-- css
+            ## Provide hex colour values for the background as implemented in
+            ## lib\Gocdb_Services\Config.php (called by 
+            ## docs\web_portal\css\web_portal.php).
+            ## [Note that these values are used as part of the dynamic css
+            ## style sheet fetched by the browser after the base html is
+            ## returned.]
+          -->
+          <css>
+            <backgroundTop>F7F9FE</backgroundTop>
+            <backgroundBottom>D0DFF9</backgroundBottom>
+          </css>
+          <!-- name_mapping
+            ## Basic rather primitive gocdb entity name mapping.
+            ## Provide word mappings to be used to 'rename' gocdb entities for use in
+            ## menus and general page display.
+            ## Implemented as look-ups function getNameMapping in 
+            ## lib\Gocdb_Services\Config.php 
+            ## Provided to rename gocdb 'enpoints' to FitSM 'components          
+          -->
+          <name_mapping>
+            <Service>
+              <ServiceEndpoint>Service Endpoint</ServiceEndpoint>
+              <endpoint>endpoint</endpoint>
+            </Service>
+          </name_mapping>
 
         <!-- Specify the URLs used to access your GOCDB web portal and PI.
         - It is important to update these values to match your deployment.
@@ -37,9 +137,16 @@
         the 'scope' parameter will return all results regardless of scope, e.g.
         'get_site' would return all sites in all scopes.
         -->
+        
         <default_scope>
             <name>EGI</name>
         </default_scope>
+        
+
+        <!-- If set to true the initial state of the scope filter drop-downs on the ngi,site,service
+             view pages is selected for the default_scope
+             -->
+        <default_filter_by_scope>false</default_filter_by_scope>
 
         <!-- Show map on the start page -->
         <show_map_on_start_page>true</show_map_on_start_page>
@@ -78,4 +185,4 @@
 
 
         </local_info>
-</schema>
+</config>

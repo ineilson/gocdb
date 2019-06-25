@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+
+<!-- Copied from https://www.ibm.com/developerworks/library/x-validxphp/ -->
+<xs:schema 
+            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+            targetNamespace="https://goc.stfc.ac.uk"
+            xmlns="https://goc.stfc.ac.uk"
+            elementFormDefault="qualified">
+
+  <xs:include schemaLocation="./web_portal/menu.xsd"/>
+
+  <xs:simpleType name="showType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="hide"/>
+      <xs:enumeration value="show"/>
+      <xs:enumeration value="no"/>
+      <xs:enumeration value="yes"/>
+      <xs:enumeration value="false"/>
+      <xs:enumeration value="true"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="config">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="local_info" minOccurs="1" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all>
+
+              <xs:element name="read_only" type="xs:boolean"/>
+              <xs:element name="filter_downtimes_by_default_scope" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="default_filter_by_scope" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="menus" type="validMenus"/>
+
+              <xs:element name="css">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="backgroundTop" type="xs:hexBinary"/>
+                    <xs:element name="backgroundBottom" type="xs:hexBinary"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="name_mapping">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="Service">
+                      <xs:complexType>
+                        <xs:all>
+                          <xs:element name="ServiceEndpoint" type="xs:string" minOccurs="0"/>
+                          <xs:element name="endpoint" type="xs:string" minOccurs="0"/>
+                        </xs:all>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="web_portal_url" type="xs:anyURI" minOccurs="0"/>
+              <xs:element name="pi_url" type="xs:anyURI" minOccurs="0"/>
+              <xs:element name="server_base_url" type="xs:anyURI" minOccurs="0"/>
+              <xs:element name="write_api_user_docs_url" type="xs:anyURI" minOccurs="0"/>
+              <xs:element name="optional_features" minOccurs="0">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="siteless_services" type="xs:boolean"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="default_scope" minOccurs="0">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="name" type="xs:string"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="show_map_on_start_page" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="default_scope_match" type="xs:string" minOccurs="0"/>
+              <xs:element name="minimum_scopes" minOccurs="0">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="ngi" type="xs:integer" minOccurs="0"/>
+                    <xs:element name="site" type="xs:integer" minOccurs="0"/>
+                    <xs:element name="service" type="xs:integer" minOccurs="0"/>
+                    <xs:element name="service_group" type="xs:integer" minOccurs="0"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="extensions" minOccurs="0">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="max" type="xs:integer"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="send_email" type="xs:boolean" minOccurs="0"/>
+            </xs:all>
+            <xs:attribute name="url" type="xs:anyURI"/>
+          </xs:complexType>
+        </xs:element>
+
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

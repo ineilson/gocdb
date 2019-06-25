@@ -23,11 +23,16 @@ namespace org\gocdb\services;
 class Config {
     private $gocdb_schemaFile;
     private $local_infoFile;
+    private $local_info_xml = NULL;
+    private $local_info_override = NULL;
+    private $xmlnsPrefix = 'goc';
+    private $xmlnsURI = 'https://goc.stfc.ac.uk';
 
 
     public function __construct() {
         $this->gocdb_schemaFile = __DIR__."/../../config/gocdb_schema.xml";
-        $this->local_infoFile =  __DIR__."/../../config/local_info.xml";
+        
+        $this->setLocalInfoFileLocation(__DIR__."/../../config/local_info.xml");
     }
 
     /**
@@ -69,13 +74,37 @@ class Config {
      * set, then defaults to <src>__DIR__."/../../config/local_info.xml</src>
      *
      * @param string $filePath
-     * @throws \LogicException If not a string
+     * @throws \ErrorException If not a string
      */
     public function setLocalInfoFileLocation($filePath){
         if(!is_string($filePath)){
-            throw new \LogicException("Invalid filePath given for local_info.xml file");
+            throw new \ErrorException("Invalid filePath given for local_info.xml file");
         }
-        $this->local_infoFile = $filePath;
+        // If this is the first time in or the path has changed save the filepath
+        // and force any existing cached object to be discarded.
+            if ($this->local_infoFile == NULL or $this->local_infoFile !== $filePath){
+            $this->local_infoFile = $filePath;
+            $this->local_info_xml = NULL;
+        }
+
+    }
+    
+    /**
+     * Set the url parameter overrides. THe url is used to match the xml section
+     * containing override values for the default local_info.
+     * 
+     * @param string $filePath
+     * @throws \LogicException If not a string     
+     */
+    public function setLocalInfoOverride ($url){
+        if(!is_string($url)){
+            throw new \LogicException("Invalid url given for local_info override.");
+        }      
+        $this->local_info_override = $url;
+        /**
+         *  Force the cached object to be discarded as the file has changed
+         */
+        $this->local_info_xml = NULL;
     }
 
     /**
@@ -87,13 +116,128 @@ class Config {
     }
 
     /**
-     * Opens the local_info.xml file for reading, returning a simplexml object.
+     * Returns a simplexml object representing the local_info.xml file
      * @return simple xml object
      */
     private function GetLocalInfoXML() {
-        return simplexml_load_file($this->getLocalInfoFileLocation());
+        if ($this->local_info_xml == NULL) {
+            if (!($this->local_info_xml = $this->readLocalInfoXML($this->getLocalInfoFileLocation(), $this->local_info_override))) {
+                throw new \ErrorException("Failed to load xml configuration file: ".$this->getLocalInfoFileLocation());
+            } 
+        } 
+        return $this->local_info_xml;
     }
 
+    /**
+     * Reads the local_info.xml, returning a simplexml object. The contents of the file are
+     * adjusted based on the url attribute provided. 
+     * @return simple xml object
+     */
+    private function readLocalInfoXML ($path, $url = NULL) {
+
+        libxml_use_internal_errors(true);
+
+        if (($base = simplexml_load_file($path)) == FALSE) {
+            $this->throwXmlErrors('Failed to load configuration file '.$path);
+        }
+
+        // Validate the the configuration file xml
+        
+        $dom = dom_import_simplexml($base);
+
+        // Cludge: we (have to) assume the schema is in the same directory as the config file.
+        // If there is no schema file then we SILENTLY carry on without validation.
+        // If you don't want to validate the schema every time the file is loaded, simply move
+        // the .xsd file out of the way. Everything except for offline validation should still
+        // work. (but you won't throw errors from an invalid file here!)
+        $schemaPath = preg_replace('/xml$/', 'xsd', $path);
+
+        if (file_exists($schemaPath) and !$dom->ownerDocument->schemaValidate($schemaPath)) {
+            $this->throwXmlErrors('Failed to validate configuration file against schema '.$path);
+        }            
+
+        if (! $base->registerXPathNamespace($this->xmlnsPrefix, $this->xmlnsURI)) {
+            throw new \ErrorException('Failed to register configuration default namespace '.$path);
+        }
+
+        // Search the input XML for a 'local_info' section that does NOT have a url attribute
+        // specified. This is the default spec.
+        if (($unqualified = $base->xpath("//$this->xmlnsPrefix:local_info[not(@url)]")) == FALSE) {
+            throw new \ErrorException('Failed to find local_info section without url in configuration file '.$path);
+        }
+
+        if (count($unqualified) != 1) {
+            throw new \ErrorException('Only one local_info element without url attribute is allowed in configuration file '.$path);
+        }
+
+        $default_info = $unqualified[0];
+        $default_info->registerXPathNamespace($this->xmlnsPrefix, $this->xmlnsURI);
+        
+        if (!is_null($url)) {
+            // Find any elements matching the given url
+            $qualified = $base->xpath("//$this->xmlnsPrefix:local_info[@url=\"$url\"]");
+
+            if (count($qualified) != 0) {
+                if (count($qualified) != 1) { 
+                    throw new \ErrorException('Duplicate local_info elements with same url attribute found in configuration file '.$path);
+                }
+
+                $iterator = new \SimpleXmlIterator ($qualified[0]->asXML());
+
+                $keys = array();
+
+                $this->descendXml($iterator, $keys, $default_info);
+
+            }
+        }
+        return $default_info;
+    }
+    /**
+     * Throws an ErrorException after appending libxml errors to the input message.
+     */
+    private function throwXmlErrors ($message) {
+        foreach (libxml_get_errors() as $err) {
+            $message .= " ".$err->message;
+        }
+        libxml_clear_errors();
+        throw new \ErrorException($message);
+    }
+    /**
+     * Iteratively passes through a given SimpleXmlIterator object overwriting the values in an input
+     * SimpleXmlElement with the values found in the iterator. 
+     * Note: The elements in the iterator MUST exist in the input element.
+     */
+    private function descendXml (\SimpleXmlIterator $iterator, $keys, \SimpleXmlElement $default_info) {      
+        
+        for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
+
+            // Seems not to be necessary but .... belt and braces with namespaces.
+            $iterator->registerXPathNamespace($this->xmlnsPrefix, $this->xmlnsURI);
+
+            $keys[] = $iterator->key();
+ 
+            if ($iterator->hasChildren()) {
+                $this->descendXml($iterator->getChildren(), $keys, $default_info);
+            } else {
+                $p = "$this->xmlnsPrefix:".implode("/$this->xmlnsPrefix:",$keys);
+                if (($elem = $default_info->xpath($p)) == FALSE) {
+                    throw new \ErrorException('Did not find elements '.$p.' in input configuration file.');
+                }
+                if (count($elem)) {
+                    if (count($elem) != 1) {
+                        throw new \ErrorException('Duplicate input configuration file element specifications ('.count($elem).') for "'.implode('/',$keys).'"');
+                    }
+                    # ???? How else to force a self-reference rather than override the array value ????
+                    $elem[0][0] = (string)$iterator->current();
+                } else {
+                    // Do we want to create it here ??
+                    throw new \ErrorException("Input configuration file override element ".implode('/',$keys)." not found in default section: ".$iterator->key().' => '.$iterator->current());
+                }
+
+            }
+            array_pop($keys);
+        }
+    }
 
     /**
      * returns true if the portal has ben set to read only mode in local_info.xml
@@ -101,11 +245,53 @@ class Config {
      */
     public function IsPortalReadOnly(){
         $localInfo = $this->GetLocalInfoXML();
-        if (strtolower($localInfo->local_info->read_only) == 'true'){
+        if (strtolower($localInfo->read_only) == 'true'){
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * returns true if the given menu is to be shown according to local_info.xml
+     * @return boolean
+     */
+    public function showMenu($menuName) {
+
+        if (empty($this->GetLocalInfoXML()->menus->$menuName)) { 
+            return true;
+        }
+
+        switch (strtolower((string) $this->GetLocalInfoXML()->menus->$menuName)) {
+            case 'false';
+            case 'hide';
+            case 'no';
+                return false;
+        }
+        return true;
+    }
+    /**
+     * returns the relevant name mapping according to local_info.xml
+     * @return string
+     */
+    public function getNameMapping($entityType, $key) {
+        if (empty($this->GetLocalInfoXML()->name_mapping->$entityType)) {
+            return $key;
+        }
+        switch ($entityType) {
+            case 'Service':
+                return $this->GetLocalInfoXML()->name_mapping->$entityType->{str_replace(' ','',$key)};
+        }
+    }
+    /**
+     * accessor function for css colour values from local_info.xml
+     * @return string
+     */
+    public function getBackgroundTop() {
+        return '#'.$this->GetLocalInfoXML()->css->backgroundTop;
+    }
+    public function getBackgroundBottom() {
+        return '#'.$this->GetLocalInfoXML()->css->backgroundBottom;
     }
 
     /**
@@ -116,7 +302,7 @@ class Config {
      */
     public function IsOptionalFeatureSet($featureName) {
         $localInfo = $this->GetLocalInfoXML();
-        $feature= $localInfo->local_info->optional_features->$featureName;
+        $feature= $localInfo->optional_features->$featureName;
         if((string) $feature == "true") {
             return true;
         } else {
@@ -131,7 +317,7 @@ class Config {
      */
     public function GetPortalURL() {
         $localInfo = $this->GetLocalInfoXML();
-        $url = $localInfo->local_info->web_portal_url;
+        $url = $localInfo->web_portal_url;
         return strval($url);
     }
 
@@ -141,7 +327,7 @@ class Config {
      */
     public function getServerBaseUrl(){
         $localInfo = $this->GetLocalInfoXML();
-        $url = $localInfo->local_info->server_base_url;
+        $url = $localInfo->server_base_url;
         return strval($url);
     }
 
@@ -151,12 +337,13 @@ class Config {
      */
     public function getWriteApiDocsUrl(){
         $localInfo = $this->GetLocalInfoXML();
-        $url = $localInfo->local_info->write_api_user_docs_url;
+        $url = $localInfo->write_api_user_docs_url;
         return strval($url);
     }
 
     public function getDefaultScopeName(){
-        $scopeName = $this->GetLocalInfoXML()->local_info->default_scope->name;
+        //$scopeName = $this->GetLocalInfoXML()->local_info->default_scope->name;
+        $scopeName = $this->GetLocalInfoXML()->default_scope->name;
 
         if (empty($scopeName)){
             $scopeName = '';
@@ -166,7 +353,7 @@ class Config {
     }
 
     public function getDefaultScopeMatch(){
-        $scopeMatch = $this->GetLocalInfoXML()->local_info->default_scope_match;
+        $scopeMatch = $this->GetLocalInfoXML()->default_scope_match;
 
         if (empty($scopeMatch)){
             $scopeMatch = 'all';
@@ -182,7 +369,7 @@ class Config {
             throw new \LogicException("Function does not support entity type");
         }
 
-        $numScopesRequired = $this->GetLocalInfoXML()->local_info->minimum_scopes->$entityType;
+        $numScopesRequired = $this->GetLocalInfoXML()->minimum_scopes->$entityType;
 
         if (empty($numScopesRequired)){
             $numScopesRequired = 0;
@@ -191,8 +378,25 @@ class Config {
         return intval($numScopesRequired);
     }
 
+    public function getFilterDowntimesByScope () {
+
+        if (strtolower($this->GetLocalInfoXML()->filter_downtimes_by_default_scope) == 'true'){
+            return true;
+        }
+
+        return false;
+    }
+    public function getDefaultFilterByScope () {
+
+        if (strtolower($this->GetLocalInfoXML()->default_filter_by_scope) == 'true'){
+            return true;
+        }
+
+        return false;
+    }
+
     public function getShowMapOnStartPage(){
-        $showMapString = $this->GetLocalInfoXML()->local_info->show_map_on_start_page;
+        $showMapString = $this->GetLocalInfoXML()->show_map_on_start_page;
 
         if(empty($showMapString)){
             $showMap = false;
@@ -208,12 +412,12 @@ class Config {
     }
 
     public function getExtensionsLimit(){
-        return $this->GetLocalInfoXML()->local_info->extensions->max;
+        return $this->GetLocalInfoXML()->extensions->max;
     }
 
 
     public function getSendEmails(){
-        $sendEmailString = $this->GetLocalInfoXML()->local_info->send_email;
+        $sendEmailString = $this->GetLocalInfoXML()->send_email;
          if(empty($sendEmailString)){
             $sendEmail = false;
         }

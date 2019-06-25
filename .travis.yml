@@ -11,6 +11,7 @@ php:
     - '5.3'
     - '5.4'
     - '5.5'
+    # - '7.3' -- so far from working :-(
 env:
     - DB=sqlite
     - DB=mysql
@@ -24,4 +25,5 @@ matrix:
       php: '5.5'
     allow_failures:
     - env: DB=sqlite
+    # - php: '7.3'
     fast_finish: true

@@ -1,3 +1,21 @@
+<?php 
+require_once __DIR__ . '/../../../lib/Gocdb_Services/Factory.php';
+header("Content-type: text/css"); 
+// Load variable values from local configuration //
+\Factory::getConfigService()->setLocalInfoOverride($_SERVER['SERVER_NAME']);
+
+$background_top = \Factory::getConfigService()->getBackgroundTop();
+$background_bottom = \Factory::getConfigService()->getBackgroundBottom();
+
+/* if (\Factory::getConfigService()->getDefaultScopeName() == 'EOSC-hub') {
+    $background_top = '#B5892D';        // eosc brown
+    $background_bottom = '#FCF2DD';     // eosc pale brown
+} else {
+    $background_top = '#F7F9FE';        // godcb default
+    $background_bottom = '#D0DFF9';
+}
+*/
+?>
 /* table.sorter plugin, http://tablesorter.com/docs/ */
 table.tablesorter {
     background-color: #CDCDCD;
@@ -38,7 +56,7 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
 
 
 body {  
-    background: linear-gradient(to bottom left,#F7F9FE, #DEE9FB, #D0DFF9);
+    background: linear-gradient(to bottom left, <?=$background_top?>, <?=$background_top?>, <?=$background_bottom?>); */
     color: #272A4B;
     font-family: 'PT Sans', sans-serif;
     font-size: 10pt;

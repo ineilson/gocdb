@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema>
+<config 
+        xmlns="https://goc.stfc.ac.uk"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://goc.stfc.ac.uk/config local_info.xsd">
+
 	<local_info>
         <!-- If read-only is set as true, the portal will prevent changes to the
              data by all users. This can be used for a read-only failover instance. -->
@@ -88,4 +92,4 @@
 
 		
 	</local_info>
-</schema>
+</config>
