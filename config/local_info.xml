@@ -1,9 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema>
+<config> 
+        <!-- 
+          ## Begin local override.
+          ## Specify a url attribute to be matched  against the incoming requestor
+          ## url. Only a single url is supported.
+          ## If the urls match, the values specified in this section will override
+          ## the default values given in the default (no url) section below.
+          ## Any valid xml element tree can be specified here but it MUST
+          ## exist in the default section that follows.
+        -->
+        <local_info url="host-172-16-113-107.nubes.stfc.ac.uk">
+
+          <read_only>true</read_only>
+          <show_map_on_start_page>false</show_map_on_start_page>
+
+        </local_info>
+        <!-- 
+          ## End local override
+        -->
+
+        <!-- 
+          ## Begin defaults
+        -->
         <local_info>
-        <!-- If read-only is set as true, the portal will prevent changes to the
+
+          <!-- If read-only is set as true, the portal will prevent changes to the
              data by all users. This can be used for a read-only failover instance. -->
-        <read_only>false</read_only>
+          <read_only>false</read_only>
 
         <!-- Specify the URLs used to access your GOCDB web portal and PI.
         - It is important to update these values to match your deployment.
@@ -37,10 +60,11 @@
         the 'scope' parameter will return all results regardless of scope, e.g.
         'get_site' would return all sites in all scopes.
         -->
+        
         <default_scope>
             <name>EGI</name>
         </default_scope>
-
+        
         <!-- Show map on the start page -->
         <show_map_on_start_page>true</show_map_on_start_page>
 
@@ -106,4 +130,4 @@
 
 
         </local_info>
-</schema>
+</config>
