@@ -14,6 +14,19 @@
           <read_only>true</read_only>
           <show_map_on_start_page>false</show_map_on_start_page>
 
+                  <!-- <filter_downtimes_by_default_scope>true</filter_downtimes_by_default_scope> -->
+
+          <menus>
+            <Projects>hide</Projects>
+            <ServiceGroups>hide</ServiceGroups>
+            <NGI>hide</NGI>
+            <AddNGI>false</AddNGI>
+            <AddProject>false</AddProject>
+            <AddSite>false</AddSite>
+            <Scopes>false</Scopes>
+            <AdminScopes>hide</AdminScopes>
+          </menus>
+          
         </local_info>
         <!-- 
           ## End local override
@@ -27,6 +40,26 @@
           <!-- If read-only is set as true, the portal will prevent changes to the
              data by all users. This can be used for a read-only failover instance. -->
           <read_only>false</read_only>
+
+          <!-- menus
+            ## Give the xml element names from config/web_portal/menu.xml
+            ## to select menu link(s) given in the left-hand menu box.
+            ## Selected menus can be hidden by providing an element value
+            ## of any of hide,false,0 or no. The default behaviour is to 
+            ## show the menu subject to the restrictions encoded in menu.xml
+            ## but any other value but those given above will also work to
+            ## enable the menu display.
+          -->
+          <menus>
+            <Projects>true</Projects>
+            <NGI>true</NGI>
+            <AddNGI>show</AddNGI>
+            <AddProject>show</AddProject>
+            <ServiceGroups>true</ServiceGroups>
+            <AddSite>true</AddSite>
+            <Scopes>true</Scopes>
+            <AdminScopes>true</AdminScopes>
+          </menus>
 
         <!-- Specify the URLs used to access your GOCDB web portal and PI.
         - It is important to update these values to match your deployment.
