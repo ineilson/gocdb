@@ -5,6 +5,7 @@ $res[1] = test_db_connection();
 $res[2] = test_url(PI_URL);
 //$res[3] = test_url(PORTAL_URL);
 $res[3] = test_url(SERVER_BASE_URL);
+$res[4] = test_config($localInfoLocation);
 
 
 $counts=array(	"ok" => 0,

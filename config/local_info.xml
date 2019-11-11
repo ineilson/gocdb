@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<config>
+<config xmlns="https://goc.stfc.ac.uk"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://goc.stfc.ac.uk/config local_info.xsd">
   <!--
     Provide default values for all configuration elements.
     See also local override information provided below this local_info element.

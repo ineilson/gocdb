@@ -6,6 +6,7 @@ $res[1] = test_db_connection();
 $res[2] = test_url(PI_URL);
 //$res[3] = test_url(PORTAL_URL);
 $res[3] = test_url(SERVER_BASE_URL);
+$res[4] = test_config($localInfoLocation);
 
 $counts=array(
         "ok" => 0,
@@ -16,32 +17,24 @@ $counts=array(
 foreach ($res as $r){
     $counts[$r["status"]]++;
 }
-/*
-If there is an error, counts["error"] is incremented, e.g.
-Array
-(
-    [ok] => 0
-    [warn] => 0
-    [error] => 1
-)
- */
-
+$ok  = "All GOCDB tests are looking good\n";
+$nok = "GOCDB Web Portal is unable to connect to the GOCDB back end database\n";
 
 /* If someone wants to test the failure, they can fake one using
  * the fake_failure parameter */
 if(isset($_REQUEST['fake_failure'])) {
     header("HTTP/1.0 500");
-    echo("GOCDB Web Portal is unable to connect to the GOCDB back end database\n");
+    echo($nok);
     die();
 }
 
 if ($counts["error"] != 0) {
     header("HTTP/1.0 500");
-    echo("GOCDB Web Portal is unable to connect to the GOCDB back end database\n");
+    echo($nok);
     die();
 }
 else {
-    echo("All GOCDB tests are looking good\n");
+    echo($ok);
     die();
 }
 
