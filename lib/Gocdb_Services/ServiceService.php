@@ -470,19 +470,24 @@ class ServiceService extends AbstractEntityService {
      * is invalid. The \Exception's message will contain a human readable error
      * message.
      */
-    private function validateProductionMonitoredCombination($serviceTypeName, $production, $monitored) {
+    private function validateProductionMonitoredCombination($serviceType, 
+                        $scopes, $production, $monitored) {
         // Service types that are exceptions to the
         // 'production => monitored' rule.
         $ruleExceptions = array('VOMS', 'emi.ARGUS', 'org.squid-cache.Squid');
 
+        $serviceTypeName = $serviceType->getName();
         // Check that the service type is not an exception to the
         // 'production => monitored'.
-        if (!in_array ($serviceTypeName, $ruleExceptions)) {
-            if ($production && !$monitored) {
+        if ($production && !$monitored) {
+            // Legacy hard-coded rules (as of Jan-20) should be removed
+            if (!in_array ($serviceTypeName, $ruleExceptions) and 
+                !$serviceType->getAllowMonitoringException()) {
                 throw new \Exception(
-                    "For the '".$serviceTypeName."' service type, if the ".
-                    "Production flag is set to True, the Monitored flag must ".
-                    "also be True.");
+                    "For the '".$serviceTypeName."' service type, if a ".
+                    "service is in Production it must be Monitored. ".
+                    "Contact GOCDB administrators if required to discuss ".
+                    "changing this requirement.");
             }
         }
     }
@@ -535,12 +540,6 @@ class ServiceService extends AbstractEntityService {
 
         $this->validate ( $newValues ['SE'], 'service' );
         $this->uniqueCheck ( $newValues ['SE'] ['HOSTNAME'], $st, $se->getParentSite () );
-        // validate production/monitored combination
-        $this->validateProductionMonitoredCombination(
-          $this->getServiceType($newValues['serviceType']),
-          $this->ptlTexToBool($newValues['PRODUCTION_LEVEL']),
-          $this->ptlTexToBool($newValues['IS_MONITORED'])
-        );
 
         // EDIT SCOPE TAGS:
         // collate selected scopeIds (reserved and non-reserved)
@@ -609,6 +608,14 @@ class ServiceService extends AbstractEntityService {
         $this->checkNumberOfScopes ( $this->scopeService->getScopesFilterByParams ( array (
                 'excludeReserved' => true
         ), $selectedScopesToApply ) );
+
+        // validate production/monitored combination
+        $this->validateProductionMonitoredCombination(
+            $st,
+            $selectedScopesToApply,
+            $this->ptlTexToBool($newValues['PRODUCTION_LEVEL']),
+            $this->ptlTexToBool($newValues['IS_MONITORED'])
+            );
 
         // Explicity demarcate our tx boundary
         $this->em->getConnection ()->beginTransaction ();
@@ -754,13 +761,6 @@ class ServiceService extends AbstractEntityService {
         $this->validate ( $values ['SE'], 'service' );
         $this->uniqueCheck ( $values ['SE'] ['HOSTNAME'], $st, $site );
 
-        // validate production/monitored combination
-        $this->validateProductionMonitoredCombination(
-          $this->getServiceType($values['serviceType']),
-          $this->ptlTexToBool($values['PRODUCTION_LEVEL']),
-          $this->ptlTexToBool($values['IS_MONITORED'])
-        );
-
         // ADD SCOPE TAGS:
         // collate selected reserved and non-reserved scopeIds.
         // Note, Reserved scopes can be inherited from the parent Site.
@@ -796,6 +796,13 @@ class ServiceService extends AbstractEntityService {
 
         // check there are the required number of OPTIONAL scopes specified
         $this->checkNumberOfScopes ( $values ['Scope_ids'] );
+
+        // validate production/monitored combination
+        $this->validateProductionMonitoredCombination(
+            $st, $selectedScopesToApply,
+            $this->ptlTexToBool($values['PRODUCTION_LEVEL']),
+            $this->ptlTexToBool($values['IS_MONITORED'])
+          );
 
         $this->em->getConnection ()->beginTransaction ();
         try {

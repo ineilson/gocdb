@@ -13,9 +13,13 @@ require_once __DIR__ . '/doctrine/SiteMoveTest.php';
 require_once __DIR__ . '/doctrine/ExtensionsTest.php';
 require_once __DIR__ . '/doctrine/Scoped_IPIQuery_Test1.php';
 require_once __DIR__ . '/doctrine/DowntimeServiceEndpointTest1.php';
+require_once __DIR__ . '/doctrine/ServiceTypeTest.php';
+
 require_once __DIR__ . '/unit/lib/Gocdb_Services/RoleActionAuthorisationServiceTest.php';
 require_once __DIR__ . '/unit/lib/Gocdb_Services/RoleActionMappingServiceTest.php';
 require_once __DIR__ . '/unit/lib/Gocdb_Services/ScopeServiceTest.php';
+require_once __DIR__ . '/unit/lib/Gocdb_Services/ServiceServiceTest.php';
+require_once __DIR__ . '/unit/lib/Gocdb_Services/ServiceTypeServiceTest.php';
 
 /**
  * TestSuite designed to run the main doctrine tests
@@ -47,10 +51,13 @@ class DoctrineTestSuite1 {
         $suite->addTestSuite('ExtensionsTest');
         $suite->addTestSuite('Scoped_IPIQuery_Test1');
         $suite->addTestSuite('DowntimeServiceEndpointTest1');
+        $suite->addTestSuite('ServiceTypeTest');
 
         $suite->addTestSuite('RoleActionAuthorisationServiceTest');
         $suite->addTestSuite('RoleActionMappingServiceTest');
         $suite->addTestSuite('ScopeServiceTest');
+        $suite->addTestSuite('ServiceServiceTest');
+        $suite->addTestSuite('ServiceTypeServiceTest');
 
         return $suite;
     }

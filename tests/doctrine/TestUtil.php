@@ -46,6 +46,13 @@ class TestUtil {
         return $se;
     }
 
+    public static function createSampleServiceType($description, $name){
+        $st = new ServiceType();
+        $st->setDescription($description);
+        $st->setName($name);
+        return $st;
+    }    
+
     public static function createSampleRoleType($name) {
         $rt = new RoleType($name);
         return $rt;

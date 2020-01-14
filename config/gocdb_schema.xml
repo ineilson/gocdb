@@ -426,6 +426,10 @@
 	    <!--<regex>/^[a-zA-Z0-9\-\._\(\)\[\],;+:\/'"\s]*$/</regex>-->
 	    <regex>/^[^`'\";&lt;&gt;]+$/</regex>
 	</field>
+    <field>
+        <fname>ALLOWMONITORINGEXCEPTION</fname>
+        <ftype>boolean</ftype>
+    </field>		
     </entity>
     <!-- ==========================================================  -->
     <entity>
