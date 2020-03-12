@@ -41,7 +41,7 @@ class ServiceType {
     /**
      * An instance of a Service of this ServiceType may
      * unmonitored while in production.
-     * @Column(type="boolean", nullable=true)
+     * @Column(type="boolean", options={"default":FALSE})
      */
     protected $allowMonitoringException;
 
