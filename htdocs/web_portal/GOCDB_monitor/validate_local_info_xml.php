@@ -1,14 +1,13 @@
 <?php
 /**
- * 
+ * Return a formatted error message given an input error object
  */
 function libxml_display_error($error)
 {
     $return = "<br/>\n";
 
     switch ($error->level) {
-    case LIBXML_ERR_WARNING:
-        $return .= "<b>Warning $error->code</b>: ";
+    case LIBXML_ERR_WARNING:$return .= "<b>Warning $error->code</b>: ";
         break;
     case LIBXML_ERR_ERROR:$return .= "<b>Error $error->code</b>: ";
         break;
@@ -24,9 +23,9 @@ function libxml_display_error($error)
     return $return;
 }
 /**
- * 
+ * Loop over all errors printing a message for each
  */
-function libxml_display_errors() 
+function libxml_display_errors()
 {
     $message = "";
 
@@ -38,7 +37,11 @@ function libxml_display_errors()
 
     return $message;
 }
-
+/**
+ * Check that the given xml matches its schema.
+ * The schema .xsd file must have the same name prefix and
+ * be in the same dir as the input .xml file
+ */
 function validate_local_info_xml ($path)
 {
     // Enable user error handling
@@ -52,8 +55,8 @@ function validate_local_info_xml ($path)
 
     if (!$xml->schemaValidate($xsd)) {
         throw new Exception (libxml_display_errors());
-    } else {
-        return;
     }
+
+    return;
 }
 ?>
