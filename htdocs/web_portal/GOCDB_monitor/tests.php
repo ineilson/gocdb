@@ -1,84 +1,125 @@
 <?php
-
+/**
+ * Common definition of constants and functions for various tests.
+ */
 require_once __DIR__."/validate_local_info_xml.php";
-
-$localInfoLocation = __DIR__."/../../../config/local_info.xml";
-$localInfoXML = simplexml_load_file($localInfoLocation);
-$webPortalURL = $localInfoXML->local_info->web_portal_url;
-$piURL = $localInfoXML->local_info->pi_url; // e.g. https://localhost/gocdbpi
-$baseURL = $localInfoXML->local_info->server_base_url;
-
-
-define("PI_URL", $piURL."/public/?method=get_site_list"); //https://localhost/gocdbpi/public/?method=get_site_list
-define("PORTAL_URL", $webPortalURL);
-define("SERVER_BASE_URL", $baseURL);
-//define("SERVER_SSLCERT", "/etc/grid-security/hostcert.pem");
-//define("SERVER_SSLKEY", "/etc/pki/tls/private/hostkey.pem");
 
 define("TEST_1", "GOCDB5 DB connection");
 define("TEST_2", "GOCDBPI_v5 availability");
 define("TEST_3", "GOCDB5 central portal availability");
 define("TEST_4", "GOCDB5 server configuration validity");
 
+define("OK","ok");
+define("NOK", "error");
+define("UKN", "unknown");
+define("OKMSG", "everything is well");
+define("UKNMSG", "no information");
+
+$localInfoLocation = __DIR__."/../../../config/local_info.xml";
+
 $test_statuses =  array(
-        TEST_1 	=> "unknown",
-        TEST_2 	=> "unknown",
-        TEST_3 	=> "unknown",
-        TEST_4  => "unknown"
+    TEST_1 	=> UKN,
+    TEST_2 	=> UKN,
+    TEST_3 	=> UKN,
+    TEST_4  => UKN
+);
+
+$test_messages =  array(
+    TEST_1 => UKNMSG,
+    TEST_2 => UKNMSG,
+    TEST_3 => UKNMSG,
+    TEST_4 => UKNMSG
 );
 
 $test_desc =  array(
-        TEST_1 => 
+        TEST_1 =>
             "Connect to GOCDB5 (RAL/master instance) from this " .
             "machine using EntityManager->getConnection()->connect()",
-        TEST_2 => 
+        TEST_2 =>
             "Retrieve https://goc.egi.eu/gocdbpi/?" .
             "method=get_site_list&sitename=RAL-LCG2 using PHP CURL",
-        TEST_3 => 
+        TEST_3 =>
             "N/A",
-        TEST_4 => 
+        TEST_4 =>
             "Server XML configuration validation."
 );
 
 $test_doc =  array(
-        TEST_1 => 
+        TEST_1 =>
             "<a href='https://svn.esc.rl.ac.uk/repos/sct-docs/SCT " .
             "Documents/Servers and Services/GOCDB/Cookbook and " .
             "recipes/database_is_down.txt' target='_blank'>" .
             "documentation/recipe</a>",
-        TEST_2 => 
+        TEST_2 =>
             "<a href='https://svn.esc.rl.ac.uk/repos/sct-docs/SCT " .
             "Documents/Servers and Services/GOCDB/Cookbook and " .
             "recipes/failover_cookbook.txt' target='_blank'>" .
             "documentation/recipe</a>",
-        TEST_3 => 
+        TEST_3 =>
             "<a href='https://svn.esc.rl.ac.uk/repos/sct-docs/SCT " .
             "Documents/Servers and Services/GOCDB/Cookbook and " .
             "recipes/failover_cookbook.txt' target='_blank'>" .
             "documentation/recipe</a>",
         TEST_4 =>
             "<p>Contact GOCDB service managers." .
-            "<br>Other tests have dependencies on the server configuration ". 
-            "<br>so may show errors if the configuration is invalid.</p>"        
+            "<br>Other tests have dependencies on the server configuration ".
+            "<br>so may show errors if the configuration is invalid.</p>"
 );
 
-$test_messages =  array(
-        TEST_1 => "no information",
-        TEST_2 => "no information",
-        TEST_3 => "no information",
-        TEST_4 => "no information"
-);
 
 $disp = array(
-        "unknown" => "<td align='center' bgcolor='#A0A0A0'>" .
-                        "<font size='1'><i>unknown</i></font></td>",
-        "warn" => "<td align='center' bgcolor='#FFAA00'>" .
-                        "<font size='1'>WARNING</font></td>",
-        "error" => "<td align='center' bgcolor='#F00000'>" .
+        UKN => "<td align='center' bgcolor='#A0A0A0'>" .
+                        "<font size='1'>UNKNOWN</font></td>",
+        NOK => "<td align='center' bgcolor='#F00000'>" .
                         "<font size='1'>ERROR</font></td>",
-        "ok" => "<td align='center' bgcolor='#00D000'>" .
+        OK => "<td align='center' bgcolor='#00D000'>" .
                         "<font size='1'>OK</font></td>",
 );
+
+// Run the tests but return nothing but a count of passes and failures
+function get_test_counts($config) {
+
+    $res[1] = test_db_connection();
+    $res[4] = test_config($config);
+
+    if ($res[4]["status"] != "error") {
+        // Only define test URLs if the config is valid
+        define_test_urls($config);
+
+        $res[2] = test_url(PI_URL);
+        $res[3] = test_url(SERVER_BASE_URL);
+    }
+
+    $counts = array("ok" => 0,
+                    "warn" => 0,
+                    "error" => 0
+            );
+
+    foreach ($res as $r){
+        $counts[$r["status"]]++;
+    }
+
+    return $counts;
+}
+
+// Define url constants for testing.
+// Note: Should only be called if test_config is successful
+function define_test_urls ($localInfoLocation) {
+
+    if (($localInfoXML = simplexml_load_file($localInfoLocation)) == FALSE) {
+        // Failed to load the config file.
+        return;
+    }
+
+    $piURL = $localInfoXML->local_info->pi_url; // e.g. https://localhost/gocdbpi
+
+    define("PI_URL",            $piURL."/public/?method=get_site_list");
+    define("PORTAL_URL",        $localInfoXML->local_info->web_portal_url);
+    define("SERVER_BASE_URL",   $localInfoXML->local_info->server_base_url);
+
+    //define("SERVER_SSLCERT", "/etc/grid-security/hostcert.pem");
+    //define("SERVER_SSLKEY", "/etc/pki/tls/private/hostkey.pem");
+}
 
 // Test the connection to the database using Doctrine
 function test_db_connection(){
@@ -87,11 +128,11 @@ function test_db_connection(){
     try {
         $entityManager = Factory::getNewEntityManager();
         $entityManager->getConnection()->connect();
-        $retval["status"] = "ok";
-        $retval["message"] = "everything is well";
+        $retval["status"] = OK;
+        $retval["message"] = OKMSG;
     } catch (\Exception $e) {
         $message = $e->getMessage();
-        $retval["status"] = "error";
+        $retval["status"] = NOK;
         $retval["message"] = "$message";
     }
 
@@ -99,19 +140,21 @@ function test_db_connection(){
 }
 
 function test_url($url) {
+
     try{
         get_https2($url);
-        $retval["status"] = "ok";
-        $retval["message"] = "everything is well";
-    } catch (Exception $exception){
-        $message = $exception->getMessage();
-        $retval["status"] = "error";
+        $retval["status"] = OK;
+        $retval["message"] = OKMSG;
+    } catch (Exception $e){
+        $message = $e->getMessage();
+        $retval["status"] = NOK;
         $retval["message"] = "$message";
     }
     return $retval;
 }
 
 function get_https2($url){
+
     $curloptions = array (
             CURLOPT_RETURNTRANSFER => false,
             CURLOPT_HEADER         => false,
@@ -147,12 +190,13 @@ function get_https2($url){
 }
 
 function test_config($localInfoLocation) {
+
     try{
         validate_local_info_xml($localInfoLocation);
-        $retval["status"] = "ok";
-        $retval["message"] = "everything is well";
+        $retval["status"] = OK;
+        $retval["message"] = OKMSG;
     } catch (Exception $Exception){
-        $retval["status"] = "error";
+        $retval["status"] = NOK;
         $retval["message"] = $Exception->getMessage();
     }
     return $retval;

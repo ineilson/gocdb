@@ -1,21 +1,7 @@
 <?php
 require_once "tests.php";
 
-$res[1] = test_db_connection();
-$res[2] = test_url(PI_URL);
-//$res[3] = test_url(PORTAL_URL);
-$res[3] = test_url(SERVER_BASE_URL);
-$res[4] = test_config($localInfoLocation);
-
-
-$counts=array(	"ok" => 0,
-                "warn" => 0,
-                "error" => 0
-            );
-
-foreach ($res as $r){
-    $counts[$r["status"]]++;
-}
+$counts = get_test_counts($localInfoLocation);
 
 if ($counts["error"] != 0) {
     echo("An error has been detected while checking GOCDB services. Please check https://goc.egi.eu/portal/GOCDB_monitor/ to find out more\n");

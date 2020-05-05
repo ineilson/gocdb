@@ -5,37 +5,41 @@
 <?php
 require_once __DIR__ . '/tests.php';
 
-echo "<p>URLs as defined by local_info.xml</p>";
-echo "<p>PI URL is: ".PI_URL."</p>";
-echo "<p>Portal URl is: ".PORTAL_URL."</p>";
-echo "<p>Server Base URL is: ".SERVER_BASE_URL."</p>";
-
 // GOCDB5 DB connection
 $res = test_db_connection();
 $test_statuses[TEST_1] = $res["status"];
 $test_messages[TEST_1] = $res["message"];
-
-// GOCDBPI v5
-$res = test_url(PI_URL);
-$test_statuses[TEST_2] = $res["status"];
-$test_messages[TEST_2] = $res["message"];
-
-// GOCDB5 web portal
-$res = test_url(SERVER_BASE_URL);
-$test_statuses[TEST_3] = $res["status"];
-$test_messages[TEST_3] = $res["message"];
 
 // GOCDB5 configuration
 $res = test_config($localInfoLocation);
 $test_statuses[TEST_4] = $res["status"];
 $test_messages[TEST_4] = $res["message"];
 
-// DISPLAY RESULTS
+// Following tests depend on the config file being valid.
+if (strcasecmp($res["status"], OK) == 0) {
+    define_test_urls($localInfoLocation);
+    // GOCDBPI v5
+    $res = test_url(PI_URL);
+    $test_statuses[TEST_2] = $res["status"];
+    $test_messages[TEST_2] = $res["message"];
+    // GOCDB5 web portal
+    $res = test_url(SERVER_BASE_URL);
+    $test_statuses[TEST_3] = $res["status"];
+    $test_messages[TEST_3] = $res["message"];
+
+    // DISPLAY RESULTS
+    echo "<p>URLs as defined by local_info.xml</p>";
+    echo "<p>PI URL is: ".PI_URL."</p>";
+    echo "<p>Portal URl is: ".PORTAL_URL."</p>";
+    echo "<p>Server Base URL is: ".SERVER_BASE_URL."</p>";
+} else {
+    echo "<p>Unable to extract URL information due to configuration test failure.</p>";
+}
 ?>
 
 <h2>Service status overview</h2>
-<p>Other tests have dependencies on the server configuration so may 
-show errors if the configuration is invalid.</p>
+<p>Other tests may have dependencies on the server configuration so may
+show ERROR or UNKNOWN if the configuration is invalid.</p>
 <table border="1" cellspacing="0" cellpadding="5">
     <thead>
         <tr>
@@ -64,13 +68,13 @@ foreach ($test_statuses as $test => $status) {
 <h2>Other tests and check pages</h2>
 <ul>
     <li><a href='http://sumatran.esc.rl.ac.uk/ganglia/?r=day&amp;
-    c=Grid+services&amp;h=gocdb-base.esc.rl.ac.uk'>GOCDB server 
-    ganglia page</a> - Useful to see if there are memory or CPU 
+    c=Grid+services&amp;h=gocdb-base.esc.rl.ac.uk'>GOCDB server
+    ganglia page</a> - Useful to see if there are memory or CPU
     problems</li>
-    <li><a href='check.php'>Status check</a> - a less vebose check of 
-    GOCDB service status. Returns the single line 'All GOCDB tests 
-    are looking good' if all tests run without error and 'GOCDB 
-    Web Portal is unable to connect to the GOCDB back end database' 
+    <li><a href='check.php'>Status check</a> - a less vebose check of
+    GOCDB service status. Returns the single line 'All GOCDB tests
+    are looking good' if all tests run without error and 'GOCDB
+    Web Portal is unable to connect to the GOCDB back end database'
     otherwise. Used for automated tests.</li>
 </ul>
 
@@ -78,9 +82,9 @@ foreach ($test_statuses as $test => $status) {
 <ul>
     <li><a href='https://svn.esc.rl.ac.uk/repos/sct-docs/SCT Documents/
     Servers and Services/GOCDB/Cookbook and recipes/
-    GOCDB_daily_maintenance.txt'>GOCDB_daily_maintenance.txt in 
+    GOCDB_daily_maintenance.txt'>GOCDB_daily_maintenance.txt in
     SCT docs on SVN</a> - This is where it all starts...</li>
     <li><a href='https://wiki.egi.eu/wiki/GOCDB_Documentation_Index'>
-    GOCDB public documentation index</a> - The RTFM link to send to 
+    GOCDB public documentation index</a> - The RTFM link to send to
     anyone who has questions</li>
 </ul>
