@@ -33,6 +33,7 @@ $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/../../lib
 //$config->setQueryCacheImpl(new \Doctrine\Common\Cache\ApcCache());
 //$config->setProxyDir('/usr/share/GOCDB5/doctrineproxies');
 
+require "/etc/gocdb/database_connection.php";
 
     ///////////////////////SQLITE CONNECTION DETAILS/////////////////////////////////////////////
     // $conn = array(
@@ -41,7 +42,7 @@ $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/../../lib
     // );
     /////////////////////////////////////////////////////////////////////////////////////////////
 
-
+    //TODO: Sort this out for Oracle
     ///////////////////////ORACLE CONNECTION DETAILS////////////////////////////////////////////
     //	$conn = array(
     //		'driver' => 'oci8',
@@ -55,21 +56,6 @@ $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/../../lib
     //  $evm = new EventManager();
     //  $evm->addEventSubscriber(new OracleSessionInit(array('NLS_TIME_FORMAT' => 'HH24:MI:SS')));
     /////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    ///////////////////////MYSQL CONNECTION DETAILS////////////////////////////////////////////
-    //$conn = array(
-    //	'driver' => 'pdo_mysql',
-    //	'user' => 'doctrine',
-    //	'password' => 'doc',
-    //	'host' => 'localhost',
-    //	'dbname' => 'doctrine',
-    //  'charset' => 'AL32UTF8'
-    //);
-    /////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
 
 // obtaining the entity manager
 $entityManager = \Doctrine\ORM\EntityManager::create($conn, $config, $evm);

@@ -15,6 +15,7 @@
  * @return PHPUnit_Extensions_Database_DB_IDatabaseConnection
  */
 function getConnectionToTestDB() {
+     require "/etc/gocdb/database_connection.php";
 
      /*** Uncomment and fill in the connection details for your chosen database ***/
 
@@ -44,8 +45,11 @@ function getConnectionToTestDB() {
      /////////////////////////////////////////////////////////////////////////////////////////////
 
      ///////////////////////MYSQL CONNECTION DETAILS//////////////////////////////////////////////
-     //  $pdo = new PDO('mysql:host=localhost;dbname=doctrine;charset=UTF8', 'doctrine', 'doc');
-     //  return new PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection($pdo);
+     // $dbParm = 'mysql:host='  . $conn['host']     . ';'.
+     //           'dbname='      . $conn['dbname']   . ';charset=UTF8';
+     //
+     // $pdo = new PDO($dbParm, $conn['user'], $conn['password']);
+     // return new PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection($pdo);
      /////////////////////////////////////////////////////////////////////////////////////////////
 }
 
