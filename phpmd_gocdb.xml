@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Custom Rules"
+         xmlns="http://pmd.sf.net/ruleset/1.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd"
+         xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd">
+    <description>
+        Customise some rules for PHP Mess Detector. (https://phpmd.org/documentation/creating-a-ruleset.html)
+    </description>
+
+    <rule ref="rulesets/controversial.xml">
+        <exclude name="CamelCaseMethodName" />
+    </rule>
+    <rule ref="rulesets/controversial.xml/CamelCaseMethodName">
+        <properties>
+            <property name="allow-underscore" value="true" />
+        </properties>
+    </rule>
+    <rule ref="rulesets/codesize.xml">
+        <exclude name="TooManyFields" />
+    </rule>
+    <rule ref="rulesets/codesize.xml/TooManyFields">
+        <properties>
+            <property name="maxfields"  value="20" />
+        </properties>
+    </rule>
+</ruleset>
