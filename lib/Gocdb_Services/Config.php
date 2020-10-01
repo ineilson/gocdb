@@ -25,7 +25,8 @@ class Config {
     private $local_infoFile;
     private $local_info_xml = NULL;
     private $local_info_override = NULL;
-
+    private $xmlnsPrefix = 'goc';
+    private $xmlnsURI = 'https://goc.stfc.ac.uk';
 
     public function __construct() {
         $this->gocdb_schemaFile = __DIR__."/../../config/gocdb_schema.xml";
@@ -139,9 +140,14 @@ class Config {
             $this->throwXmlErrors('Failed to load configuration file '.$path);
         }
 
+        // A default namespace must be registered for the xpath search to function.
+        if (! $base->registerXPathNamespace($this->xmlnsPrefix, $this->xmlnsURI)) {
+            throw new \ErrorException('Failed to register configuration default namespace '.$path);
+        }
+
         // Search the input XML for a 'local_info' section that does NOT have a url attribute
         // specified. This is the default spec.
-        if (($unqualified = $base->xpath("//local_info[not(@url)]")) == FALSE) {
+        if (($unqualified = $base->xpath("//$this->xmlnsPrefix:local_info[not(@url)]")) == FALSE) {
             throw new \ErrorException('Failed to find local_info section without url in configuration file '.$path);
         }
 

@@ -1,11 +1,24 @@
 <?xml version="1.0"?>
 
 <!-- Copied from https://www.ibm.com/developerworks/library/x-validxphp/ -->
-<xs:schema 
-            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+<xs:schema
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
             targetNamespace="https://goc.stfc.ac.uk"
             xmlns="https://goc.stfc.ac.uk"
             elementFormDefault="qualified">
+
+  <xs:include schemaLocation="./web_portal/menu.xsd"/>
+
+  <xs:simpleType name="showType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="hide"/>
+      <xs:enumeration value="show"/>
+      <xs:enumeration value="no"/>
+      <xs:enumeration value="yes"/>
+      <xs:enumeration value="false"/>
+      <xs:enumeration value="true"/>
+    </xs:restriction>
+  </xs:simpleType>
 
   <xs:element name="config">
     <xs:complexType>
@@ -15,6 +28,37 @@
             <xs:all>
 
               <xs:element name="read_only" type="xs:boolean"/>
+              <xs:element name="filter_downtimes_by_default_scope" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="default_filter_by_scope" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="menus" type="validMenus"/>
+
+              <xs:element name="css">
+                <xs:complexType>
+                  <xs:all>
+                    <!-- Use string type to allow standard colour names -->
+                    <xs:element name="backgroundColour1" type="xs:string"/>
+                    <xs:element name="backgroundColour2" type="xs:string"/>
+                    <xs:element name="backgroundColour3" type="xs:string"/>
+                    <xs:element name="backgroundDirection" type="xs:string"/>
+                    <xs:element name="headingTextColour" type="xs:string"/>
+
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="name_mapping">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="Service">
+                      <xs:complexType>
+                        <xs:all>
+                          <xs:element name="ServiceEndpoint" type="xs:string" minOccurs="0"/>
+                          <xs:element name="endpoint" type="xs:string" minOccurs="0"/>
+                        </xs:all>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
               <xs:element name="web_portal_url" type="xs:anyURI" minOccurs="0"/>
               <xs:element name="pi_url" type="xs:anyURI" minOccurs="0"/>
               <xs:element name="server_base_url" type="xs:anyURI" minOccurs="0"/>
