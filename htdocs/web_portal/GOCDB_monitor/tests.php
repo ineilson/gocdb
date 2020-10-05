@@ -3,6 +3,8 @@
  * Common definition of constants and functions for various tests.
  */
 require_once __DIR__."/validate_local_info_xml.php";
+require_once __DIR__."/../../../lib/Gocdb_Services/Factory.php";
+require_once __DIR__."/../../../lib/Gocdb_Services/Config.php";
 
 define("TEST_1", "GOCDB5 DB connection");
 define("TEST_2", "GOCDBPI_v5 availability");
@@ -16,6 +18,12 @@ define("OKMSG", "everything is well");
 define("UKNMSG", "no information");
 
 $localInfoLocation = __DIR__."/../../../config/local_info.xml";
+
+// Initialise configuration for target URL
+
+$config = \Factory::getConfigService();
+$config->setLocalInfoOverride($_SERVER['SERVER_NAME']);
+$config->setLocalInfoFileLocation($localInfoLocation);
 
 $test_statuses =  array(
     TEST_1 	=> UKN,
@@ -104,18 +112,14 @@ function get_test_counts($config) {
 
 // Define url constants for testing.
 // Note: Should only be called if test_config is successful
-function define_test_urls ($localInfoLocation) {
+function define_test_urls ($config) {
 
-    if (($localInfoXML = simplexml_load_file($localInfoLocation)) == FALSE) {
-        // Failed to load the config file.
-        return;
-    }
+    list($serverBaseURL, $webPortalURL, $piURL) = $config->getURLs();
 
-    $piURL = $localInfoXML->local_info->pi_url; // e.g. https://localhost/gocdbpi
-
+    // ??pi_url not used anywhere else??
     define("PI_URL",            $piURL."/public/?method=get_site_list");
-    define("PORTAL_URL",        $localInfoXML->local_info->web_portal_url);
-    define("SERVER_BASE_URL",   $localInfoXML->local_info->server_base_url);
+    define("PORTAL_URL",        $webPortalURL);
+    define("SERVER_BASE_URL",   $serverBaseURL  );
 
     //define("SERVER_SSLCERT", "/etc/grid-security/hostcert.pem");
     //define("SERVER_SSLKEY", "/etc/pki/tls/private/hostkey.pem");
@@ -123,7 +127,6 @@ function define_test_urls ($localInfoLocation) {
 
 // Test the connection to the database using Doctrine
 function test_db_connection(){
-    require_once __DIR__ . '/../../../lib/Gocdb_Services/Factory.php';
 
     try {
         $entityManager = Factory::getNewEntityManager();
@@ -189,10 +192,10 @@ function get_https2($url){
     return $return;
 }
 
-function test_config($localInfoLocation) {
+function test_config($config) {
 
     try{
-        validate_local_info_xml($localInfoLocation);
+        validate_local_info_xml($config->getLocalInfoFileLocation());
         $retval["status"] = OK;
         $retval["message"] = OKMSG;
     } catch (Exception $Exception){

@@ -6,9 +6,6 @@
 -->
 <xs:schema version="1.0"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
-      targetNamespace="https://goc.stfc.ac.uk"
-      xmlns="https://goc.stfc.ac.uk"
-      elementFormDefault="qualified"
       >
   <xs:complexType name="validMenus">
     <xs:all>

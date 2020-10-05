@@ -25,8 +25,6 @@ class Config {
     private $local_infoFile;
     private $local_info_xml = NULL;
     private $local_info_override = NULL;
-    private $xmlnsPrefix = 'goc';
-    private $xmlnsURI = 'https://goc.stfc.ac.uk';
 
     public function __construct() {
         $this->gocdb_schemaFile = __DIR__."/../../config/gocdb_schema.xml";
@@ -139,15 +137,9 @@ class Config {
         if (($base = simplexml_load_file($path)) == FALSE) {
             $this->throwXmlErrors('Failed to load configuration file '.$path);
         }
-
-        // A default namespace must be registered for the xpath search to function.
-        if (! $base->registerXPathNamespace($this->xmlnsPrefix, $this->xmlnsURI)) {
-            throw new \ErrorException('Failed to register configuration default namespace '.$path);
-        }
-
         // Search the input XML for a 'local_info' section that does NOT have a url attribute
         // specified. This is the default spec.
-        if (($unqualified = $base->xpath("//$this->xmlnsPrefix:local_info[not(@url)]")) == FALSE) {
+        if (($unqualified = $base->xpath("//local_info[not(@url)]")) == FALSE) {
             throw new \ErrorException('Failed to find local_info section without url in configuration file '.$path);
         }
 
@@ -320,7 +312,17 @@ class Config {
         $url = $localInfo->server_base_url;
         return strval($url);
     }
+    /**
+     * Convenience function to return the 3 configuration URLs
+     */
+    public function getURLs() {
+        $localInfo = $this->GetLocalInfoXML();
+        $serverBaseUrl = $localInfo->server_base_url;
+        $webPortalUrl = $localInfo->web_portal_url;
+        $piUrl = $localInfo->pi_url;
 
+        return array($serverBaseUrl, $webPortalUrl, $piUrl);
+    }
     /**
      * The wtite API documentation URL as recorded in local_info.xml.
      * This URL is given to users of the write API in error messages

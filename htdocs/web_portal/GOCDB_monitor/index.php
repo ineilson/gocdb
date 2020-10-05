@@ -11,13 +11,13 @@ $test_statuses[TEST_1] = $res["status"];
 $test_messages[TEST_1] = $res["message"];
 
 // GOCDB5 configuration
-$res = test_config($localInfoLocation);
+$res = test_config($config);
 $test_statuses[TEST_4] = $res["status"];
 $test_messages[TEST_4] = $res["message"];
 
 // Following tests depend on the config file being valid.
 if (strcasecmp($res["status"], OK) == 0) {
-    define_test_urls($localInfoLocation);
+    define_test_urls($config);
     // GOCDBPI v5
     $res = test_url(PI_URL);
     $test_statuses[TEST_2] = $res["status"];

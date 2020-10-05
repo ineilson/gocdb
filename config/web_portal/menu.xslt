@@ -19,9 +19,6 @@
 </xsl:comment>
   <xsl:text disable-output-escaping="yes">&lt;xs:schema version="1.0"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
-      targetNamespace="https://goc.stfc.ac.uk"
-      xmlns="https://goc.stfc.ac.uk"
-      elementFormDefault="qualified"
       &gt;</xsl:text>
   <xsl:text disable-output-escaping="yes">
   &lt;xs:complexType name="validMenus"&gt;

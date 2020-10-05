@@ -1,11 +1,7 @@
 <?xml version="1.0"?>
 
 <!-- Copied from https://www.ibm.com/developerworks/library/x-validxphp/ -->
-<xs:schema
-            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="https://goc.stfc.ac.uk"
-            xmlns="https://goc.stfc.ac.uk"
-            elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
   <xs:include schemaLocation="./web_portal/menu.xsd"/>
 
@@ -27,12 +23,12 @@
           <xs:complexType>
             <xs:all>
 
-              <xs:element name="read_only" type="xs:boolean"/>
+              <xs:element name="read_only" type="xs:boolean" minOccurs="0"/>
               <xs:element name="filter_downtimes_by_default_scope" type="xs:boolean" minOccurs="0"/>
               <xs:element name="default_filter_by_scope" type="xs:boolean" minOccurs="0"/>
-              <xs:element name="menus" type="validMenus"/>
+              <xs:element name="menus" type="validMenus" minOccurs="0"/>
 
-              <xs:element name="css">
+              <xs:element name="css" minOccurs="0">
                 <xs:complexType>
                   <xs:all>
                     <!-- Use string type to allow standard colour names -->
@@ -45,7 +41,7 @@
                   </xs:all>
                 </xs:complexType>
               </xs:element>
-              <xs:element name="name_mapping">
+              <xs:element name="name_mapping" minOccurs="0">
                 <xs:complexType>
                   <xs:all>
                     <xs:element name="Service">
@@ -96,7 +92,7 @@
                   </xs:all>
                 </xs:complexType>
               </xs:element>
-              <xs:element name="reserved_scopes" minOccurs="1" maxOccurs="1">
+              <xs:element name="reserved_scopes" minOccurs="0">
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="scope" type="xs:string" minOccurs="1" maxOccurs='unbounded'/>

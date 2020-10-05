@@ -1,7 +1,7 @@
 <?php
 require_once "tests.php";
 
-$counts = get_test_counts($localInfoLocation);
+$counts = get_test_counts($config);
 
 if ($counts["error"] != 0) {
     echo("An error has been detected while checking GOCDB services. Please check https://goc.egi.eu/portal/GOCDB_monitor/ to find out more\n");

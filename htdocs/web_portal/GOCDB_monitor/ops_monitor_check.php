@@ -1,9 +1,10 @@
 <?php
 require_once "tests.php";
 
-$counts = get_test_counts($localInfoLocation);
+$counts = get_test_counts($config);
 
 $ok  = "All GOCDB tests are looking good\n";
+// Error message may be incorrect - not only the connection could be failing.
 $nok = "GOCDB Web Portal is unable to connect to the GOCDB back end database\n";
 
 /* If someone wants to test the failure, they can fake one using
