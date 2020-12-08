@@ -27,13 +27,27 @@
             </div>
             <div style="float: right;">
                 <script type="text/javascript" src="<?php echo \GocContextPath::getPath()?>javascript/confirm.js"></script>
-                <a onclick="return confirmSubmit()"
-                    href="index.php?Page_Type=Delete_User&id=<?php echo $params['user']->getId() ?>">
-                    <img src="<?php echo \GocContextPath::getPath()?>img/trash.png" height="25px" style="float: right; margin-right: 0.4em;" />
-                    <br />
-                    <br />
-                    <span>Delete</span>
-                </a>
+                <?php
+                    # If the user owns any API Credentials we grey and disable the delete-user icon
+                    $opacity = "1.0";
+                    if (!$params['APIAuthEnts']->isEmpty()) {
+                        $opacity = "0.5";
+                    }
+                    echo '<div style="opacity: '. $opacity . '" >';
+                        echo '<a ';
+                            if ($params['APIAuthEnts']->isEmpty()) {
+                                echo ' onclick="return confirmSubmit()"';
+                                echo ' href="index.php?Page_Type=Delete_User&id='. $params['user']->getId() . '"';
+                            } else {
+                                echo ' title="Delete disabled: Remove API credentials before deleting this user."';
+                            }
+                        echo ' >'; # <a ...
+                            echo '<img src="' . \GocContextPath::getPath() .'img/trash.png" height="25px" style="float: right; margin-right: 0.4em;" />';
+                            echo '<br /><br /><span>Delete</span>';
+                        echo '</a>';
+                    echo '</div>';
+
+                ?>
             </div>
         <?php endif; ?>
     </div>
@@ -323,7 +337,7 @@
                     <th class="site_table">Type</th>
                     <th class="site_table">Identifier</th>
                     <th class="site_table">Site</th>
-                    <th class="site_table">API Write</th>
+                    <th class="site_table" style="width:10%">API Write</th>
                 </tr>
                 <?php
                     foreach ($params['APIAuthEnts'] as $APIAuthEnt) { ?>
