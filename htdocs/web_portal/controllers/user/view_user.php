@@ -27,19 +27,27 @@ function view_user() {
     if (!isset($_GET['id']) || !is_numeric($_GET['id']) ){
         throw new Exception("An id must be specified");
     }
-    $userId =  $_GET['id'];
-    $user = \Factory::getUserService()->getUser($userId);
+
+    $userService = \Factory::getUserService();
+    $user = $userService->getUser($_GET['id']);
+
     if($user === null){
        throw new Exception("No user with that ID");
     }
-    $params['user'] = $user;
 
-    $apiAuthEnts = $user->getAPIAuthenticationEntities();
-    $authEntSites = array();
-    /** @var \APIAuthentication $apiAuth */
-    foreach ($apiAuthEnts as $apiAuth) {
-        $authEntSites[$apiAuth->getParentSite()->getId()]++;
-    }
+    $callingUser = \Factory::getUserService()->getUserByPrinciple(Get_User_Principle());
+
+    // Restrict users to see only their own data unless authorised.
+    // User objects are not 'owned' so we check their authz at connected sites.
+    if (is_null($callingUser) ||
+        (!$callingUser->isAdmin() &&
+         $user !== $callingUser &&
+        !$userService->isAllowReadPD($callingUser)))
+        {
+            throw new Exception('You are not authorised to read other users\' personal data.');
+        }
+
+    $params['user'] = $user;
 
     // 2D array, each element stores role and a child array holding project Ids
     $role_ProjIds = array();
@@ -72,8 +80,6 @@ function view_user() {
         $authorisingRoles = \Factory::getRoleActionAuthorisationService()
             ->authoriseAction(\Action::REVOKE_ROLE, $roleOwnedEntity, $callingUser)
             ->getGrantingRoles();
-
-        $callingUser = \Factory::getUserService()->getUserByPrinciple(Get_User_Principle());
 
         if ($user != $callingUser) {
             // determine if callingUser can REVOKE this role instance
