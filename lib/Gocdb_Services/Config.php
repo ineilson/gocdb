@@ -304,7 +304,20 @@ class Config {
         $url = $localInfo->web_portal_url;
         return strval($url);
     }
-
+    /**
+     * How Personal Data is restricted;
+     * See description in local_info.xml but in brief:
+     * @returns false for legacy behaviour, true for role-based personal data restriction
+     */
+    public function isRestrictPDByRole() {
+        $localInfo = $this->GetLocalInfoXML();
+        $value = $localInfo->restrict_personal_data;
+        if((string) $value == "true") {
+            return true;
+        } else {
+            return false;
+        }
+    }
     /**
      * The base server URL as recorded in local_info.xml. This URL is used with the
      * PI query output, e.g. for building paging/HATEOAS links.
@@ -316,7 +329,7 @@ class Config {
     }
 
     /**
-     * The wtite API documentation URL as recorded in local_info.xml.
+     * The write API documentation URL as recorded in local_info.xml.
      * This URL is given to users of the write API in error messages
      */
     public function getWriteApiDocsUrl(){
