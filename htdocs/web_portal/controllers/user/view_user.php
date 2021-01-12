@@ -56,8 +56,6 @@ function view_user() {
     $roleService = \Factory::getRoleService();
     $roles = $roleService->getUserRoles($user, \RoleStatus::GRANTED); //$user->getRoles();
 
-    $roleSiteCounts = array(); // Holds the number of roles held per site authentication entity
-
     // can the calling user revoke the targetUser's roles?
     /** @var \Role $r */
 
@@ -118,18 +116,6 @@ function view_user() {
         // store role and parent projIds in a 2D array for viewing
         $role_ProjIds[] = array($r, $projIds);
     }// end iterating roles
-
-    // Pass over the role list disabling revoke button where the user owns
-    // a API credential(s) and only a single site role
-
-    foreach ($role_ProjIds as &$pid) {
-        $site = $pid[0]->getOwnedEntity()->getId();
-        if ($roleSiteCounts[$site] == 1) {
-            $decorator = $pid[0]->getDecoratorObject();
-            $decorator["revokeButton"] = "disabled";
-            $pid[0]->setDecoratorObject($decorator);
-        }
-    }
 
     // Get a list of the projects and their Ids for grouping roles by proj in view
     $projectNamesIds = array();

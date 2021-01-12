@@ -397,12 +397,14 @@ class Site extends AbstractEntityService{
      * @param integer $siteId Site id or null
      * @param string $siteExtPropKeyName Site extension property name
      * @param string $siteExtPropKeyValue Site extension property value
+     * @param string $apiAuthId Authentication entity identifier
      * @return array An array of site objects with joined entities.
      */
     public function getSitesBy(
             $ngiName=NULL, $prodStatus=NULL, $certStatus=NULL,
             $scopeName=NULL, $showClosed=NULL, $siteId=NULL,
-            $siteExtPropKeyName=NULL, $siteExtPropKeyValue=NULL) {
+            $siteExtPropKeyName=NULL, $siteExtPropKeyValue=NULL,
+            $apiAuthId=NULL) {
 
         $qb = $this->em->createQueryBuilder();
         $qb ->select('DISTINCT s', 'sc', 'n', 'i')
@@ -460,6 +462,17 @@ class Site extends AbstractEntityService{
             $qb ->setParameter(':keyname', $siteExtPropKeyName)
             ->setParameter(':keyvalue', $siteExtPropKeyValue);
 
+        }
+
+        if ($apiAuthId != null && $apiAuthId != '%%') {
+            $sQ = $this->em->createQueryBuilder();
+            $sQ ->select('s1'.'.id')
+            ->from('Site', 's1')
+            ->join('s1.APIAuthenticationEntities', 'authEnt')
+            ->andWhere($sQ->expr()->eq('authEnt.identifier', ':authid'));
+
+            $qb->andWhere($qb->expr()->in('s', $sQ->getDQL()));
+            $qb->setParameter('authid', $apiAuthId);
         }
 
         $query = $qb->getQuery();
