@@ -45,6 +45,11 @@ function edit_entity() {
     $authEnt = $serv->getAPIAuthenticationEntity($_REQUEST['authentityid']);
     $site = $authEnt->getParentSite();
 
+    // Validate the user has permission to edit properties
+    if (!$serv->userCanEditSite($user, $site)) {
+        throw new \Exception("Permission denied: a site role is required to edit authentication entities at " . $site->getShortName());
+    }
+
     if($_POST) {     // If we receive a POST request it's to edit an authentication entity
         submit($user, $authEnt, $site, $serv);
     } else { // If there is no post data, draw the edit authentication entity form
@@ -65,8 +70,6 @@ function draw(\User $user = null, \APIAuthentication $authEnt = null, \Site $sit
     $params['allowWrite'] = $authEnt->getAllowAPIWrite();
     // If the user is changing, send in the new user DN
     if ($user->getId() != $authEnt->getUser()->getId()) {
-        // TODO-irn: Check here if the authEnt DN is the same as the originating
-        // user DN and deny change to the DN if it is ???
         $params['currentUserIdent'] = $authEnt->getUser()->getCertificateDn();
     }
 
@@ -74,7 +77,7 @@ function draw(\User $user = null, \APIAuthentication $authEnt = null, \Site $sit
     die();
 }
 
-function submit(\User $user, \APIAuthentication $authEnt, \Site $site, $serv) {
+function submit(\User $user, \APIAuthentication $authEnt, \Site $site, org\gocdb\services\Site $serv) {
     $newValues = getAPIAuthenticationFromWeb();
 
     try {
