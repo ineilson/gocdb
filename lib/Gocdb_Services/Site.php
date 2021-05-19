@@ -1372,20 +1372,6 @@ class Site extends AbstractEntityService{
         return $xmlString;
     }
 
-    private function uniqueAPIAuthEnt(\Site $site, $identifier, $type) {
-        //TODO: This would probably be more effecient as a DQL query
-        $existingAuthEnts = $site->getAPIAuthenticationEntities();
-
-        foreach ($existingAuthEnts as $authEnt) {
-            if($authEnt->getIdentifier()==$identifier && $authEnt->getType() == $type) {
-                throw new \Exception(
-                    "An authentication object of type \"$type\" and with identifier " .
-                    "\"$identifier\" already exists for " . $site->getName()
-                );
-            }
-        }
-    }
-
     /**
      * Finds a single API authentication entity by ID and returns its entity
      * @param int $id the authentication entity ID
@@ -1405,44 +1391,10 @@ class Site extends AbstractEntityService{
         // Validate the user has permission to add properties
         $this->checkUserAuthz ($user, $site);
 
-        $identifier = $newValues['IDENTIFIER'];
-        $type = $newValues['TYPE'];
-        $allowWrite = $newValues['ALLOW_WRITE'];
+        $authEntServ = \Factory::getAPIAuthenticationService();
+        $authEntServ->setEntityManager($this->em);
 
-        //Check that an identifier has been provided
-        if(empty($identifier)){
-            throw new \Exception("A value must be provided for the identifier");
-        }
-
-        //validate the values against the schema
-        $this->validate($newValues,'APIAUTHENTICATION');
-
-        //If the entity is of type X509, do a more thorough check than the validate service (as we know the type)
-        //Note that we are allowing ':' as they can appear in robot DN's
-        if ($type == 'X509' && !preg_match("/^(\/[A-Za-z]+=[a-zA-Z0-9\/\-\_\s\.,'@:\/]+)*$/", $identifier)) {
-            throw new \Exception("Invalid x509 DN");
-        }
-
-        //Check there isn't already a identifier of that type with that identifier for that Site
-        $this->uniqueAPIAuthEnt($site, $identifier, $type);
-
-        //Add the properties
-        $this->em->getConnection()->beginTransaction();
-        try {
-            $authEnt = new \APIAuthentication();
-            $authEnt->setIdentifier($identifier);
-            $authEnt->setAllowAPIWrite($allowWrite);
-            $authEnt->setType($type);
-            $site->addAPIAuthenticationEntitiesDoJoin($authEnt);
-            $user->addAPIAuthenticationEntitiesDoJoin($authEnt);
-            $this->em->persist($authEnt);
-            $this->em->flush();
-            $this->em->getConnection()->commit();
-        } catch (\Exception $e) {
-            $this->em->getConnection()->rollback();
-            $this->em->close();
-            throw $e;
-        }
+        $authEnt = $authEntServ->addAPIAuthentication($site, $user, $newValues);
 
         return $authEnt;
     }
@@ -1455,22 +1407,10 @@ class Site extends AbstractEntityService{
         // Check the user can do this. Thows exception if not.
         $this->checkUserAuthz($user, $parentSite);
 
-        //delete the entity
-        $this->em->getConnection()->beginTransaction();
+        $authEntServ = \Factory::getAPIAuthenticationService();
+        $authEntServ->setEntityManager($this->em);
 
-        try {
-            //Remove the authentication entity from the site then remove the entity
-            $parentSite->getAPIAuthenticationEntities()->removeElement($authEntity);
-            $this->em->remove($authEntity);
-
-            $this->em->persist($parentSite);
-            $this->em->flush();
-            $this->em->getConnection()->commit();
-        } catch (\Exception $e) {
-            $this->em->getConnection()->rollback();
-            $this->em->close();
-            throw $e;
-        }
+        $authEntServ->deleteAPIAuthentication($authEntity);
     }
 
     public function editAPIAuthEntity(\APIAuthentication $authEntity, \User $user, $newValues) {
@@ -1482,50 +1422,26 @@ class Site extends AbstractEntityService{
 
         $identifier = $newValues['IDENTIFIER'];
         $type = $newValues['TYPE'];
-        $allowWrite = $newValues['ALLOW_WRITE'];
-
-        //Check that an identifier ha been provided
-        if(empty($identifier)){
-            throw new \Exception("A value must be provided for the identifier");
-        }
-
-        //validate the values against the schema
-        $this->validate($newValues,'APIAUTHENTICATION');
-
-
-        //If the entity is of type X509, do a more thorough check than the validate service (as we know the type)
-        //Note that we are allowing ':' as they can appear in robot DN's
-        if ($type == 'X509' && !preg_match("/^(\/[A-Za-z]+=[a-zA-Z0-9\/\-\_\s\.,'@:\/]+)*$/", $identifier)) {
-            throw new \Exception("Invalid x509 DN");
-        }
 
         /**
-        * As long as something has changed, check there isn't already a
-        * identifier of that type with that identifier for that Site
-        * Note: We might still be changing the allow API write value.
+        @var org\gocdb\services\APIAuthenticationService
+        */
+        $authEntServ = \Factory::getAPIAuthenticationService();
+        $authEntServ->setEntityManager($this->em);
+
+        /**
+        * If identifier or type has changed, check the credential is not
+        * already registered.
         */
         if (!($authEntity->getIdentifier() == $identifier &&
               $authEntity->getType() == $type)) {
-            $this->uniqueAPIAuthEnt($parentSite, $identifier, $type);
+            $authEntServ->uniqueAPIAuthEnt($parentSite, $identifier, $type);
         }
 
-        //Edit the property
-        $this->em->getConnection()->beginTransaction();
-        try {
-            $authEntity->setIdentifier($identifier);
-            $authEntity->setType($type);
-            $authEntity->setAllowAPIWrite($allowWrite);
-            $user->addAPIAuthenticationEntitiesDoJoin($authEntity);
-            $this->em->persist($authEntity);
-            $this->em->flush();
-            $this->em->getConnection()->commit();
-        } catch (\Exception $e) {
-            $this->em->getConnection()->rollback();
-            $this->em->close();
-            throw $e;
-        }
+        $authEntServ->editAPIAuthentication($authEntity, $user, $newValues);
 
         return $authEntity;
+
     }
     /**
      * Helper combines admin check and authz check to make sure a user
