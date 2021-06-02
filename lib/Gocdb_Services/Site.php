@@ -965,11 +965,16 @@ class Site extends AbstractEntityService{
     * @return boolian
     */
     public function userCanEditSite(\User $user, \Site $site) {
-        if ($this->roleActionAuthorisationService->authoriseAction(\Action::EDIT_OBJECT, $site, $user)->getGrantAction() == FALSE) {
+
+        if (is_null($user)) {
             return false;
-        } else {
+        }
+
+        if ($this->roleActionAuthorisationService->authoriseAction(\Action::EDIT_OBJECT, $site, $user)->getGrantAction() == TRUE) {
             return true;
         }
+
+        return false;
     }
 
     /**
@@ -1396,13 +1401,9 @@ class Site extends AbstractEntityService{
     }
 
     public function addAPIAuthEntity(\Site $site, \User $user, $newValues) {
-        //Check the portal is not in read only mode, throws exception if it is
-        $this->checkPortalIsNotReadOnlyOrUserIsAdmin($user);
 
         // Validate the user has permission to add properties
-        if (!$this->userCanEditSite($user, $site)) {
-            throw new \Exception("You don't have permission to add authentication entties to " . $site->getShortName());
-        }
+        $this->checkUserAuthz ($user, $site);
 
         $identifier = $newValues['IDENTIFIER'];
         $type = $newValues['TYPE'];
@@ -1447,20 +1448,17 @@ class Site extends AbstractEntityService{
     }
 
     public function deleteAPIAuthEntity(\APIAuthentication $authEntity, \User $user) {
-        //Check the portal is not in read only mode, throws exception if it is
-        $this->checkPortalIsNotReadOnlyOrUserIsAdmin($user);
 
         // Validate the user has permission to delete properties
-        $site = $authEntity->getParentSite();
-        if (!$this->userCanEditSite($user, $site)) {
-            throw new \Exception("You don't have permission to add authentication entities to " . $site->getShortName());
-        }
+        $parentSite = $authEntity->getParentSite();
+
+        // Check the user can do this. Thows exception if not.
+        $this->checkUserAuthz($user, $parentSite);
 
         //delete the entity
         $this->em->getConnection()->beginTransaction();
-        try {
-            $parentSite = $authEntity->getParentSite();
 
+        try {
             //Remove the authentication entity from the site then remove the entity
             $parentSite->getAPIAuthenticationEntities()->removeElement($authEntity);
             $this->em->remove($authEntity);
@@ -1476,15 +1474,11 @@ class Site extends AbstractEntityService{
     }
 
     public function editAPIAuthEntity(\APIAuthentication $authEntity, \User $user, $newValues) {
-        //Check the portal is not in read only mode, throws exception if it is
-        $this->checkPortalIsNotReadOnlyOrUserIsAdmin($user);
 
-        $site = $authEntity->getParentSite();
+        $parentSite = $authEntity->getParentSite();
 
-        // Validate the user has permission to edit properties
-        if (!$this->userCanEditSite($user, $site)) {
-            throw new \Exception("Permission denied: a site role is required to add authentication entities to " . $site->getShortName());
-        }
+        // Check the user can do this. Thows exception if not.
+        $this->checkUserAuthz($user, $parentSite);
 
         $identifier = $newValues['IDENTIFIER'];
         $type = $newValues['TYPE'];
@@ -1512,7 +1506,7 @@ class Site extends AbstractEntityService{
         */
         if (!($authEntity->getIdentifier() == $identifier &&
               $authEntity->getType() == $type)) {
-            $this->uniqueAPIAuthEnt($site, $identifier, $type);
+            $this->uniqueAPIAuthEnt($parentSite, $identifier, $type);
         }
 
         //Edit the property
@@ -1532,5 +1526,20 @@ class Site extends AbstractEntityService{
         }
 
         return $authEntity;
+    }
+    /**
+     * Helper combines admin check and authz check to make sure a user
+     * can modify properties of the site.
+     *
+     * @throws \Exception
+     */
+    private function checkUserAuthz (\User $user, \Site $site) {
+
+        $this->checkPortalIsNotReadOnlyOrUserIsAdmin($user);
+
+        // Validate the user has permission to edit properties
+        if (!$this->userCanEditSite($user, $site)) {
+            throw new \Exception("Permission denied: a site role is required to modify authentication entities on site " . $site->getShortName());
+        }
     }
 }
