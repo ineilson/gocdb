@@ -49,6 +49,7 @@ class PIWriteRequest {
   private $supportedAPIVersions= array("v5");
   private $supportedRequestMethods= array("POST","PUT","DELETE");
 
+  private $configServ;
   private $baseUrl;
   private $docsURL=null;
   private $apiVersion=null;
@@ -76,7 +77,6 @@ class PIWriteRequest {
   #An array of generic exception messages used by multiple functions
   private $genericExceptionMessages = array();
 
-
   /**
    * construct function for PIWriteREquest class.
    *
@@ -88,11 +88,11 @@ class PIWriteRequest {
     # has not yet been created, otherwise the previously created instance
     # will be returned.
     ## TODO check url override initialisation
-    $configServ = \Factory::getConfigService();
+    $this->configServ = \Factory::getConfigService();
 
     # returns the base portal URL as defined in conf file
-    $this->baseUrl = $configServ->getServerBaseUrl() . "/gocdbpi";
-    $this->docsURL = $configServ->getWriteApiDocsUrl();    # returns the base portal URL as defined in conf file
+    $this->baseUrl = $this->configServ->getServerBaseUrl() . "/gocdbpi";
+    $this->docsURL = $this->configServ->getWriteApiDocsUrl();    # returns the base portal URL as defined in conf file
 
     #Define some generic exception messages (remaining ones will be generated once entity type and value are known)
     $this->genericExceptionMessages["URLFormat"] =
@@ -568,13 +568,12 @@ class PIWriteRequest {
   }
 
   /**
-  * Returns true if portal is read only portal is read only
+  * Returns true if portal is read only
   *
   * @return boolean
   */
   private function portalIsReadOnly() {
-    $configServ = \Factory::getConfigService();
-    return $configServ->IsPortalReadOnly();
+    return $this->configServ->IsPortalReadOnly();
   }
 
   /**
