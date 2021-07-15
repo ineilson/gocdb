@@ -44,8 +44,16 @@
     <div style="float: left; width: 100%; margin-top: 2em;">
          <div class="alert alert-warning" role="alert">
             <ul>
-              <li>By registering a GOCDB account you have agreed to abide by the <a href="/aup.html" target="_blank" title="opens in new window">GOCDB Acceptable Use Policy and Conditions of Use <img src="/portal/img/new_window.png" alt="new window logo" class="new_window"></a>.</li>
-              <li>Personal data, which you provide and is collected when you use GOCDB, is processed in accordance with the <a href="/privacy.html" target="_blank" title="opens in new window">GOCDB Privacy Notice <img src="/portal/img/new_window.png" alt="new window logo"  class="new_window"></a>.</li>
+              <li>By registering a GOCDB account you have agreed to abide by the
+                  <a href="<?php echo $params['aup']; ?>" target="_blank" title="<?php echo $params['aup_title']?>">
+                  <?php echo $params['aup_title']; ?>
+                  <img src="/portal/img/new_window.png" alt="new window logo" class="new_window"></a>
+              </li>
+              <li>Personal data, which you provide and is collected when you use GOCDB, is processed in accordance with the
+                  <a href="<?php echo $params['privacy_notice']; ?>" target="_blank" title="<?php echo $params['privacy_notice_title']?>">
+                  <?php echo $params['privacy_notice_title']; ?>
+                  <img src="/portal/img/new_window.png" alt="new window logo"  class="new_window"></a>
+              </li>
             </ul>
         </div>
 

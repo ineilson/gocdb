@@ -11,9 +11,15 @@
     <div class="alert alert-warning" role="alert">
             <h3>Terms and Conditions of Account Registration</h3>
             <ul>
-               <li>By registering a GOCDB account you are agreeing to abide by the <a href="/aup.html" target="_blank" title="opens in new window">GOCDB Acceptable Use Policy and Conditions of Use <img src="/portal/img/new_window.png" alt="new window logo" class="new_window"></a>.
+               <li>By registering a GOCDB account you are agreeing to abide by the
+                   <a href="<?php echo $params["aup"]?>" target="_blank" title="<?php echo $params["aup_title"]?>">
+                   <?php echo $params["aup_title"]?>
+                   <img src="/portal/img/new_window.png" alt="new window logo" class="new_window"></a>
                </li>
-               <li>Personal data, which you provide below and that is collected when you use GOCDB, will be processed in accordance with the <a href="/privacy.html" target="_blank" title="opens in new window">GOCDB Privacy Notice <img src="/portal/img/new_window.png" alt="new window logo"  class="new_window"></a>.
+               <li>Personal data, which you provide below and that is collected when you use GOCDB, will be processed in accordance with the
+                   <a href="<?php echo $params["privacy_notice"]?>" target="_blank" title="<?php echo $params["privacy_notice_title"]?>">
+                   <?php echo $params["privacy_notice_title"]?>
+                   <img src="/portal/img/new_window.png" alt="new window logo"  class="new_window"></a>
                </li><br>
                <li>Please read both the above documents before registering your account.
               </li>

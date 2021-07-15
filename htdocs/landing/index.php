@@ -1,3 +1,8 @@
+<?php
+  require_once __DIR__.'/../../lib/Gocdb_Services/Factory.php';
+  $configServ = \Factory::getConfigService();
+  $configServ->setLocalInfoOverride($_SERVER['SERVER_NAME']);
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -18,9 +23,20 @@
             <h1 class="Landing_Welcome">Welcome to GOCDB</h1>
           </div>
           <div style="width: 80%; margin-left: auto; margin-right: auto;">
-            <p>Use of GOCDB is governed by the <a class="docLink hover" href="aup.html">EGI Acceptable Use Policy</a> which places restrictions on your use of the service.</p>
-            <p>The <a class="docLink hover" href="privacy.html">GOCDB Privacy Notice</a> describes what personal data is collected and why, and your rights regarding this data.</p>
-            <p> Please read these documents before accessing GOCDB.</p>
+            <?php
+              echo '<p>Use of GOCDB is governed by the <a class="docLink hover" target="_blank" ';
+              echo 'href="' . $configServ->getAUP() . '" title="' . $configServ->getAUPTitle() . '"';
+              echo '>' . $configServ->getAUPTitle();
+              echo '<img alt="new window logo"  class="new_window" src="new_window.png">';
+              echo '</a> which places restrictions on your use of the service.</p>';
+              echo '<p>The <a class="docLink hover" target="_blank" ';
+              echo 'href="' . $configServ->getPrivacyNotice() . '" title="' . $configServ->getPrivacyNoticeTitle() . '"';
+              echo $configServ->getPrivacyNotice();
+              echo '>' . $configServ->getPrivacyNoticeTitle();
+              echo '<img alt="new window logo"  class="new_window" src="new_window.png">';
+              echo '</a> describes what personal data is collected and why, and your rights regarding this data.</p>';
+              echo '<p> Please read these documents before accessing GOCDB.</p>';
+            ?>
             <a href="/portal/" class="button">Access GOCDB</a>
             <p>Browse the <a href="https://wiki.egi.eu/wiki/GOCDB" class="docLink hover">GOCDB documentation index</a> on the EGI wiki.</p>
           </div>

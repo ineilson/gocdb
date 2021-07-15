@@ -56,6 +56,9 @@ function draw() {
     die();
     }
 
+    $params = [];
+    getPolicyURLs($params);
+
     /* @var $authToken \org\gocdb\security\authentication\IAuthentication */
     $authToken = Get_User_AuthToken();
     $params['authAttributes'] = $authToken->getDetails();
